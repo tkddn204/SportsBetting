@@ -1,0 +1,91 @@
+group 'SsangGland'
+version '1.0'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    jcenter()
+    //mavenCentral()
+}
+
+sourceSets {
+    main.resources.srcDir 'src/main/java'
+    test.resources.srcDir 'src/test/java'
+}
+
+dependencies {
+    compileOnly     'org.projectlombok:lombok:1.+'
+
+    compile         'org.hibernate:hibernate-core:5.1.+'
+    compile         'org.hibernate:hibernate-c3p0:5.1.+'
+    runtime         'com.mchange:c3p0:0.+'
+
+    compile         'org.slf4j:slf4j-api:1.7.+'
+    runtime         'ch.qos.logback:logback-classic:1.+'
+
+    runtime         'org.hsqldb:hsqldb:2.+'
+    runtime         'com.h2database:h2:1.+'
+    runtime         'mysql:mysql-connector-java:5.+'
+    runtime         'org.postgresql:postgresql:9.+'
+
+    testCompileOnly 'org.projectlombok:lombok:1.+'
+
+    testCompile     'junit:junit:4.+'
+    testCompile     'org.hamcrest:hamcrest-library:1.+'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.3.1'
+}
+
+task run(type: JavaExec) {
+    main = project.findProperty('mainClass') ?: 'com.ssanggland.App'
+    if (project.hasProperty('mainArgument')) {
+        args ( mainArgument.split() )			          // args 'one', 'two'
+    }
+    classpath = sourceSets.main.runtimeClasspath	// dependsOn: classes
+}
+
+task db(type: JavaExec) {
+    main = 'org.hsqldb.util.DatabaseManagerSwing'
+    args '--driver',   jdbcDriver
+    args '--url',      jdbcUrl
+    args '--user',     jdbcUsername
+    if (jdbcPassword != '') {                     // for Windows
+        args '--password', jdbcPassword
+    }
+    classpath = configurations.runtime			      // libraries only
+}
+
+task schema(dependsOn: classes, type: JavaExec) {
+    main = 'org.hibernate.tool.hbm2ddl.SchemaExport'
+    args '--config=hibernate.cfg.xml', '--text', '--format', '--delimiter=;'
+    //args '--create'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task printClasspath {
+    doLast {
+        println configurations.compile.asPath
+        //println configurations.runtime.asPath
+    }
+}
+
+task pprintClasspath {
+    doLast {
+        configurations.compile.each { File file -> println file.name }
+        //configurations.runtime.files.each { File file -> println file.name }
+    }
+}
+
+task printProps {
+    doLast {
+        println "hibernate.dialect      = ${hibernateDialect}"
+        println "hibernate.driver_class = ${jdbcDriver}"
+        println "hibernate.url          = ${jdbcUrl}"
+        println "hibernate.username     = ${jdbcUsername}"
+        println "hibernate.password     = ${jdbcPassword}"
+    }
+}
