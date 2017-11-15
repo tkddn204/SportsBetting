@@ -1,5 +1,7 @@
 package com.ssanggland.views;
 
+import com.ssanggland.models.User;
+import com.ssanggland.util.HibernateUtil;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -18,6 +20,10 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+
+import java.util.Date;
 
 public class Main extends Application {
 
@@ -175,6 +181,10 @@ public class Main extends Application {
             if(textfield_registration_id.getText().equals("") | passwordfield_registration_pwd.getText().equals("") | textField_name.getText().equals(""))
                 text_error.setText("Error !");
             else {
+                registerUser(textfield_registration_id.getText(),
+                        textField_name.getText(),
+                        passwordfield_registration_pwd.getText());
+
                 text_error.setText("");
                 textfield_registration_id.setText("");
                 passwordfield_registration_pwd.setText("");
@@ -195,12 +205,16 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-    class User {
-        int user_num_id;
-        String user_name;
-        String user_id;
-        int money;
-        int betting_match_id[];
+    private void registerUser(String userLoginId, String userName, String userPass) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+
+        Transaction transaction = session.beginTransaction();
+
+        User user = new User(userLoginId, userName, userPass);
+        session.save(user);
+
+        transaction.commit();
+
     }
 
     public static void main(String[] args) {

@@ -17,7 +17,7 @@ public class Dividend implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "match_id")
-    private Match match;
+    private PlayMatch playMatch;
 
     @Column
     private float dividendRate;

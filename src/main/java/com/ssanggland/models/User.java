@@ -3,6 +3,7 @@ package com.ssanggland.models;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 public class User implements Serializable {
@@ -11,24 +12,33 @@ public class User implements Serializable {
     @GeneratedValue
     private long id;
 
+    @Column(name = "login_id")
+    private String loginId;
+
     @Column
     private String name;
 
     @Column
-    private int password;
+    private String password;
 
     @Column
     private long money;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_dividend",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "dividend_id"))
+    private Set<Dividend> userDividends;
 
     @Temporal(TemporalType.DATE)
     @Column(name = "create_date")
     private Date createDate = new Date();
 
-    public User(String name, int password, long money, Date createDate) {
+    public User(String loginId, String name, String password) {
+        this.loginId = loginId;
         this.name = name;
         this.password = password;
-        this.money = money;
-        this.createDate = createDate;
+        this.money = 1000L;
     }
 
     public long getId() {
@@ -39,6 +49,14 @@ public class User implements Serializable {
         this.id = id;
     }
 
+    public String getLoginId() {
+        return loginId;
+    }
+
+    public void setLoginId(String loginId) {
+        this.loginId = loginId;
+    }
+
     public String getName() {
         return name;
     }
@@ -47,11 +65,11 @@ public class User implements Serializable {
         this.name = name;
     }
 
-    public int getPassword() {
+    public String getPassword() {
         return password;
     }
 
-    public void setPassword(int password) {
+    public void setPassword(String password) {
         this.password = password;
     }
 
@@ -61,6 +79,14 @@ public class User implements Serializable {
 
     public void setMoney(long money) {
         this.money = money;
+    }
+
+    public Set<Dividend> getUserDividends() {
+        return userDividends;
+    }
+
+    public void setUserDividends(Set<Dividend> userDividends) {
+        this.userDividends = userDividends;
     }
 
     public Date getCreateDate() {

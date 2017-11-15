@@ -7,17 +7,19 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-public class Match implements Serializable {
+public class PlayMatch implements Serializable {
     @Id
     @Column(name = "match_id")
     @GeneratedValue
     private long id;
 
-    @Column(name = "home_team")
-    private long homeTeam;
+    @ManyToOne
+    @JoinColumn(name = "home_team_id")
+    private Team homeTeam;
 
-    @Column(name = "away_team")
-    private long awayTeam;
+    @ManyToOne
+    @JoinColumn(name = "away_team_id")
+    private Team awayTeam;
 
     @Enumerated(EnumType.STRING)
     private MatchStadium matchStadium;
@@ -28,7 +30,7 @@ public class Match implements Serializable {
     @Column(name = "end_game_date")
     private Date endGameDate;
 
-    public Match(long homeTeam, long awayTeam, MatchStadium matchStadium, Date kickoffDate, Date endGameDate) {
+    public PlayMatch(Team homeTeam, Team awayTeam, MatchStadium matchStadium, Date kickoffDate, Date endGameDate) {
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
         this.matchStadium = matchStadium;
@@ -44,19 +46,19 @@ public class Match implements Serializable {
         this.id = id;
     }
 
-    public long getHomeTeam() {
+    public Team getHomeTeam() {
         return homeTeam;
     }
 
-    public void setHomeTeam(long homeTeam) {
+    public void setHomeTeam(Team homeTeam) {
         this.homeTeam = homeTeam;
     }
 
-    public long getAwayTeam() {
+    public Team getAwayTeam() {
         return awayTeam;
     }
 
-    public void setAwayTeam(long awayTeam) {
+    public void setAwayTeam(Team awayTeam) {
         this.awayTeam = awayTeam;
     }
 

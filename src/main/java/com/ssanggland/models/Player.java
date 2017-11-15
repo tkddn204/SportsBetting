@@ -20,8 +20,7 @@ public class Player {
     @Enumerated(EnumType.STRING)
     private PositionOfPlayer position;
 
-    @Column
-    @OneToMany(mappedBy = "team_id")
+    @ManyToOne(fetch = FetchType.LAZY)
     private Team team;
 
     public Player(String name, int age, PositionOfPlayer position, Team team) {

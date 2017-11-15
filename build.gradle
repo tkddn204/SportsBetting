@@ -2,6 +2,7 @@ group 'SsangGland'
 version '1.0'
 
 apply plugin: 'java'
+compileJava.options.encoding = 'UTF-8'
 
 sourceCompatibility = 1.8
 
@@ -62,7 +63,7 @@ task db(type: JavaExec) {
 task schema(dependsOn: classes, type: JavaExec) {
     main = 'org.hibernate.tool.hbm2ddl.SchemaExport'
     args '--config=hibernate.cfg.xml', '--text', '--format', '--delimiter=;'
-    //args '--create'
+    args '--create'
     classpath = sourceSets.main.runtimeClasspath
 }
 

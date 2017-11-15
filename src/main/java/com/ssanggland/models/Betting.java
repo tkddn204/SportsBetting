@@ -6,22 +6,11 @@ import java.util.Date;
 
 @Entity
 public class Betting implements Serializable {
-    @Id
-    @Column(name = "betting_id")
-    @GeneratedValue
+
     private long id;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
     private User user;
-
-    @Column(name = "betting_money")
     private long bettingMoney;
-
-    @Temporal(TemporalType.DATE)
     private Date bettingTime;
-
-    @Column(name = "betting_result")
     private String bettingResult;
 
     public Betting(User user, long bettingMoney, Date bettingTime, String bettingResult) {
@@ -31,6 +20,9 @@ public class Betting implements Serializable {
         this.bettingResult = bettingResult;
     }
 
+    @Id
+    @Column(name = "betting_id")
+    @GeneratedValue
     public long getId() {
         return id;
     }
@@ -39,6 +31,8 @@ public class Betting implements Serializable {
         this.id = id;
     }
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     public User getUser() {
         return user;
     }
@@ -47,6 +41,7 @@ public class Betting implements Serializable {
         this.user = user;
     }
 
+    @Column(name = "betting_money")
     public long getBettingMoney() {
         return bettingMoney;
     }
@@ -55,6 +50,7 @@ public class Betting implements Serializable {
         this.bettingMoney = bettingMoney;
     }
 
+    @Temporal(TemporalType.DATE)
     public Date getBettingTime() {
         return bettingTime;
     }
@@ -63,6 +59,7 @@ public class Betting implements Serializable {
         this.bettingTime = bettingTime;
     }
 
+    @Column(name = "betting_result")
     public String getBettingResult() {
         return bettingResult;
     }

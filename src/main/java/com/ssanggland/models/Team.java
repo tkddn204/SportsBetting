@@ -1,10 +1,8 @@
 package com.ssanggland.models;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Set;
 
 @Entity
 public class Team implements Serializable {
@@ -24,6 +22,9 @@ public class Team implements Serializable {
 
     @Column
     private String stadium;
+
+    @OneToMany(mappedBy = "team")
+    private Set<Player> players;
 
     public Team(String name, String record, int overall, String stadium) {
         this.name = name;
