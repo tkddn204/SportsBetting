@@ -1,7 +1,5 @@
 package com.ssanggland.views;
 
-import com.ssanggland.models.User;
-import com.ssanggland.util.HibernateUtil;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -20,31 +18,20 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-
-import java.util.Date;
 
 public class Main extends Application {
 
     Stage window;
     Scene login_scene, registration_scene, main_scene;
 
-    // user ID
-    String user_id;
-    // user password
-    String user_pwd;
-    // user name
-    String user_name;
-
-
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent roots = FXMLLoader.load(getClass().getResource("sample.fxml"));
         window = primaryStage;
         main_scene = new Scene(roots);
+
         // Text Setting
-        Text text = new Text("Developed by SSangland");
+        Text text = new Text("19세 이상만 사용 가능한 프로그램입니다.");
         // Setting Font Size
         text.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.ITALIC,20));
         // Setting Text Position
@@ -70,7 +57,7 @@ public class Main extends Application {
         Text text_error_login = new Text();
 
         //creating text field ID
-        javafx.scene.control.TextField textfield_ID = new javafx.scene.control.TextField();
+        TextField textfield_ID = new TextField();
         TextField textfield_registration_id = new TextField();
 
         //creating password field password
@@ -81,21 +68,21 @@ public class Main extends Application {
         TextField textField_name = new TextField();
 
         //creating button login
-        javafx.scene.control.Button button_login = new javafx.scene.control.Button("Login");
+        Button button_login = new Button("Login");
 
         //creating button exit
-        javafx.scene.control.Button button_exit = new javafx.scene.control.Button("Exit");
+        Button button_exit = new Button("Exit");
 
         //creating button sign up
-        javafx.scene.control.Button button_signup = new Button("Sign up");
+        Button button_signup = new Button("Sign up");
 
         //creating button sign up in registration scene
         Button button_registration_signup = new Button ("Sign up(@)");
 
         /* ********************This is main scene componant****************************/
         //User Information
-        Text text_userid = new Text(user_id);
-        Text text_username = new Text(user_name);
+       // Text text_userid = new Text(user_id);
+        //Text text_username = new Text(user_name);
 
         /*  ************************************************************************* */
         //creating GridPane
@@ -178,13 +165,10 @@ public class Main extends Application {
         });
 
         button_registration_signup.setOnAction(e->{
-            if(textfield_registration_id.getText().equals("") | passwordfield_registration_pwd.getText().equals("") | textField_name.getText().equals(""))
+            if(textfield_registration_id.getText().equals("") | passwordfield_registration_pwd.getText().equals("") | textField_name.getText().equals("")
+                    ||textfield_registration_id.getLength()>15)
                 text_error.setText("Error !");
             else {
-                registerUser(textfield_registration_id.getText(),
-                        textField_name.getText(),
-                        passwordfield_registration_pwd.getText());
-
                 text_error.setText("");
                 textfield_registration_id.setText("");
                 passwordfield_registration_pwd.setText("");
@@ -205,17 +189,24 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-    private void registerUser(String userLoginId, String userName, String userPass) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
+//   User user;
+//    private void registerCommit(String userId, String userPassword, String userName) {
+//        Transaction transaction = session.beginTransaction();
+//        user = new User(userId, userPassword, userName);
+//        session.save(user);
+//        transaction.commit();
+//    }
 
-        Transaction transaction = session.beginTransaction();
-
-        User user = new User(userLoginId, userName, userPass);
-        session.save(user);
-
-        transaction.commit();
-
-    }
+//    private boolean loginCheck(String user_id, String password_id) {
+//        // 쿼리 보내서 id랑 일치하는거 하나만 받음
+//        Query query = session.createQuery("from User where User.id = ?");
+//        query.setParameter(0, user_id);
+//        User user = (User)query.uniqueResult();
+//        if(user == null || !user.getPassword().equals(password_id)) {
+//            return false;
+//        }
+//        return true;
+//    }
 
     public static void main(String[] args) {
         launch(args);

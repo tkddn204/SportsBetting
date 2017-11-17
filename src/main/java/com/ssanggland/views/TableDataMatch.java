@@ -28,7 +28,5 @@ public class TableDataMatch {
         return draw_dividend;
     }
 
-    public StringProperty away_dividendProperty() {
-        return away_dividend;
-    }
+    public StringProperty away_dividendProperty() { return away_dividend;  }
 }
