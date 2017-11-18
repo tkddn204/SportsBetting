@@ -1,5 +1,7 @@
 package com.ssanggland.views;
 
+import com.ssanggland.models.User;
+import com.ssanggland.util.HibernateUtil;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -18,6 +20,10 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import org.hibernate.Query;
+import org.hibernate.QueryException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 public class Main extends Application {
 
@@ -156,8 +162,10 @@ public class Main extends Application {
         button_login.setOnAction(e-> {
             if(textfield_ID.getText().equals("") | passwordfield_pwd.getText().equals("")) {
                 text_error_login.setText("Error !");
+            } else if (!validUserCheck(textfield_ID.getText(), passwordfield_pwd.getText())){
                 textfield_ID.setText("");
                 passwordfield_pwd.setText("");
+                text_error_login.setText("Error !");
             } else {
                 window.setScene(main_scene);
                 window.setTitle("Give me Money");
@@ -165,16 +173,24 @@ public class Main extends Application {
         });
 
         button_registration_signup.setOnAction(e->{
-            if(textfield_registration_id.getText().equals("") | passwordfield_registration_pwd.getText().equals("") | textField_name.getText().equals("")
-                    ||textfield_registration_id.getLength()>15)
+            if(textfield_registration_id.getText().equals("")
+                    || passwordfield_registration_pwd.getText().equals("")
+                    || textField_name.getText().equals("")
+                    || textfield_registration_id.getLength()>15)
                 text_error.setText("Error !");
             else {
-                text_error.setText("");
+                if(registerCommit(textfield_registration_id.getText(),
+                        passwordfield_registration_pwd.getText(),
+                        textField_name.getText())) {
+                    text_error.setText("");
+                    window.setScene(login_scene);
+                    window.setTitle("Login");
+                } else {
+                    text_error.setText("이미 존재하는 아이디입니다!");
+                }
                 textfield_registration_id.setText("");
                 passwordfield_registration_pwd.setText("");
-                text_name.setText("");
-                window.setScene(login_scene);
-                window.setTitle("Login");
+                textField_name.setText("");
             }
         });
 
@@ -189,26 +205,45 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-//   User user;
-//    private void registerCommit(String userId, String userPassword, String userName) {
-//        Transaction transaction = session.beginTransaction();
-//        user = new User(userId, userPassword, userName);
-//        session.save(user);
-//        transaction.commit();
-//    }
+    Session session;
+    private boolean registerCommit(String userId, String userPassword, String userName) {
+        if (validUserCheck(userId, userPassword)) {
+            return false;
+        }
+        Transaction transaction = session.beginTransaction();
+        User user = new User(userId, userPassword, userName);
+        session.save(user);
+        transaction.commit();
+        return true;
+    }
 
-//    private boolean loginCheck(String user_id, String password_id) {
-//        // 쿼리 보내서 id랑 일치하는거 하나만 받음
-//        Query query = session.createQuery("from User where User.id = ?");
-//        query.setParameter(0, user_id);
-//        User user = (User)query.uniqueResult();
-//        if(user == null || !user.getPassword().equals(password_id)) {
-//            return false;
-//        }
-//        return true;
-//    }
+    private boolean validUserCheck(String user_id, String password_id) {
+        // 쿼리 보내서 id랑 일치하는거 하나만 받음
+        Transaction transaction = session.beginTransaction();
+        Query query = session.createQuery("from User u where u.loginId = ?");
+        query.setParameter(0, user_id);
+        User user = (User)query.uniqueResult();
+        transaction.commit();
+        if(user == null || !user.getPassword().equals(password_id)) {
+            return false;
+        }
+        return true;
+    }
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    @Override
+    public void init() throws Exception {
+        super.init();
+        session = HibernateUtil.getSessionFactory().openSession();
+    }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        session.close();
+        HibernateUtil.getSessionFactory().close();
     }
 }

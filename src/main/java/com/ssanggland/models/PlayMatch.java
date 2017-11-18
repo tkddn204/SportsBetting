@@ -13,11 +13,11 @@ public class PlayMatch implements Serializable {
     @GeneratedValue
     private long id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "home_team_id")
     private Team homeTeam;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "away_team_id")
     private Team awayTeam;
 

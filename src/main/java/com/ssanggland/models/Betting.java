@@ -9,6 +9,7 @@ public class Betting implements Serializable {
 
     private long id;
     private User user;
+    private Dividend dividend;
     private long bettingMoney;
     private Date bettingTime;
     private String bettingResult;
@@ -31,7 +32,7 @@ public class Betting implements Serializable {
         this.id = id;
     }
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     public User getUser() {
         return user;
@@ -39,6 +40,16 @@ public class Betting implements Serializable {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "dividend_id")
+    public Dividend getDividend() {
+        return dividend;
+    }
+
+    public void setDividend(Dividend dividend) {
+        this.dividend = dividend;
     }
 
     @Column(name = "betting_money")

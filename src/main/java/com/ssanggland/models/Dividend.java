@@ -4,6 +4,8 @@ import com.ssanggland.models.enumtypes.KindOfDividend;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Dividend implements Serializable {
@@ -21,6 +23,9 @@ public class Dividend implements Serializable {
 
     @Column
     private float dividendRate;
+
+    @OneToMany(mappedBy = "dividend")
+    private Set<Betting> bettings = new HashSet<>();
 
     public Dividend(KindOfDividend kindOfDividend, float dividendRate) {
         this.kindOfDividend = kindOfDividend;
@@ -49,5 +54,21 @@ public class Dividend implements Serializable {
 
     public void setDividendRate(float dividendRate) {
         this.dividendRate = dividendRate;
+    }
+
+    public PlayMatch getPlayMatch() {
+        return playMatch;
+    }
+
+    public void setPlayMatch(PlayMatch playMatch) {
+        this.playMatch = playMatch;
+    }
+
+    public Set<Betting> getBettings() {
+        return bettings;
+    }
+
+    public void setBettings(Set<Betting> bettings) {
+        this.bettings = bettings;
     }
 }

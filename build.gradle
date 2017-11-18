@@ -42,7 +42,7 @@ task wrapper(type: Wrapper) {
 }
 
 task run(type: JavaExec) {
-    main = project.findProperty('mainClass') ?: 'com.ssanggland.App'
+    main = project.findProperty('mainClass') ?: 'com.ssanggland.views.Main'
     if (project.hasProperty('mainArgument')) {
         args ( mainArgument.split() )			          // args 'one', 'two'
     }

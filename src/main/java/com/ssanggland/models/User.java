@@ -3,6 +3,7 @@ package com.ssanggland.models;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -12,23 +13,20 @@ public class User implements Serializable {
     @GeneratedValue
     private long id;
 
-    @Column(name = "login_id")
+    @Column(name = "login_id", nullable = false)
     private String loginId;
 
-    @Column
+    @Column(nullable = false)
     private String name;
 
-    @Column
+    @Column(nullable = false)
     private String password;
 
-    @Column
-    private long money;
+    @Column(nullable = false)
+    private long money = 1000L;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "user_dividend",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "dividend_id"))
-    private Set<Dividend> userDividends;
+    @OneToMany(mappedBy = "user")
+    private Set<Betting> bettings = new HashSet<>();
 
     @Temporal(TemporalType.DATE)
     @Column(name = "create_date")
@@ -38,7 +36,6 @@ public class User implements Serializable {
         this.loginId = loginId;
         this.name = name;
         this.password = password;
-        this.money = 1000L;
     }
 
     public long getId() {
@@ -81,12 +78,12 @@ public class User implements Serializable {
         this.money = money;
     }
 
-    public Set<Dividend> getUserDividends() {
-        return userDividends;
+    public Set<Betting> getBettings() {
+        return bettings;
     }
 
-    public void setUserDividends(Set<Dividend> userDividends) {
-        this.userDividends = userDividends;
+    public void setBettings(Set<Betting> bettings) {
+        this.bettings = bettings;
     }
 
     public Date getCreateDate() {

@@ -20,7 +20,7 @@ public class Player {
     @Enumerated(EnumType.STRING)
     private PositionOfPlayer position;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Team team;
 
     public Player(String name, int age, PositionOfPlayer position, Team team) {
