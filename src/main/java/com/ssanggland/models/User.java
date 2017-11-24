@@ -25,17 +25,17 @@ public class User implements Serializable {
     @Column(nullable = false)
     private long money = 1000L;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.DETACH)
     private Set<Betting> bettings = new HashSet<>();
 
     @Temporal(TemporalType.DATE)
     @Column(name = "create_date")
     private Date createDate = new Date();
 
-    public User(String loginId, String name, String password) {
+    public User(String loginId, String password, String name) {
         this.loginId = loginId;
-        this.name = name;
         this.password = password;
+        this.name = name;
     }
 
     public long getId() {

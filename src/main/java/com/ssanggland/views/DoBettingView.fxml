@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.text.Text?>
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.ssanggland.views.DoBettingViewControler"
+            prefHeight="180.0" prefWidth="218.0">
+    <children>
+        <Label layoutX="67.0" layoutY="10.0" text="Sports Betting !" />
+        <Label layoutX="0.0" layoutY="40.0" fx:id="matchLineUp" textAlignment="CENTER"/>
+        <Button layoutX="10.0" layoutY="70.0" text="Home" fx:id="betHomeBtn" onAction="#BetBtnAction1"/>
+        <Button layoutX="82.0" layoutY="70.0" text="Draw" fx:id="betDrawBtn" onAction="#BetBtnAction2"/>
+        <Button layoutX="150.0" layoutY="70.0" text="Away" fx:id="betAwayBtn" onAction="#BetBtnAction3"/>
+    </children>
+
+</AnchorPane>

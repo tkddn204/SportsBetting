@@ -1,26 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
-<AnchorPane prefHeight="600" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.ssanggland.views.Controller">
-    <children>
-        <Label layoutX="42.0" layoutY="28.0" text="아이디 :" />
-        <Label layoutX="42.0" layoutY="66.0" text="금액 :" />
-        <Label layoutX="120.0" layoutY="28.0" text="dddd" fx:id="userId"/>
-        <Label layoutX="120.0" layoutY="66.0" text="13,947,413원" fx:id="userMoney" />
-        <Button layoutX="280.0" layoutY="28.0" text="경기 정보" fx:id="infoBtn"
-        onAction="#infoBtnAction"/>
-        <Button layoutX="380.0" layoutY="28.0" text="배팅 결과" fx:id="resultBtn"
-        onAction="#resultBtnAction"/>
 
-        <TableView fx:id = "matchTableView" layoutX="280.0" layoutY="66.0" prefHeight="500.0" prefWidth="600.0">
+<AnchorPane prefHeight="600" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ssanggland.views.Controller">
+    <children>
+        <Label layoutX="42.0" layoutY="28.0" text="이름 :" />
+        <Label layoutX="42.0" layoutY="66.0" text="금액 :" />
+        <Label fx:id="userName" layoutX="120.0" layoutY="28.0" />
+        <Label fx:id="userMoney" layoutX="120.0" layoutY="66.0" text="13,947,413원" />
+        <Button fx:id="infoBtn" layoutX="280.0" layoutY="28.0" onAction="#infoBtnAction" text="경기 정보" />
+        <Button fx:id="resultBtn" layoutX="380.0" layoutY="28.0" onAction="#resultBtnAction" text="배팅 결과" />
+
+        <TableView fx:id="matchTableView" layoutX="280.0" layoutY="66.0" prefHeight="500.0" prefWidth="600.0">
             <columns>
-                <TableColumn prefWidth="390.0" text="Match" fx:id="matchColumn"/>
-                <TableColumn prefWidth="70.0" text="Home"  fx:id="homeColumn"/>
-                <TableColumn prefWidth="70.0" text="Draw"  fx:id="drawColumn"/>
-                <TableColumn prefWidth="70.0" text="Away" fx:id="awayColumn"/>
+                <TableColumn fx:id="matchColumn" prefWidth="390.0" text="경기 정보" />
+                <TableColumn fx:id="homeColumn" prefWidth="70.0" text="Home" />
+                <TableColumn fx:id="drawColumn" prefWidth="70.0" text="Draw" />
+                <TableColumn fx:id="awayColumn" prefWidth="70.0" text="Away" />
             </columns>
         </TableView>
+        <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="75.0" layoutY="198.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@19.png" />
+            </image>
+        </ImageView>
+        <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="75.0" layoutY="391.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@gambling.jpg" />
+            </image>
+        </ImageView>
+
     </children>
 </AnchorPane>

@@ -23,8 +23,8 @@ public class Team implements Serializable {
     @Column
     private String stadium;
 
-    @OneToMany(mappedBy = "team")
-    private Set<Player> players;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private League league;
 
     public Team(String name, String record, int overall, String stadium) {
         this.name = name;
