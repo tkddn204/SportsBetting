@@ -15,22 +15,37 @@ public class Team implements Serializable {
     private String name;
 
     @Column
-    private String record;
-
-    @Column
     private int overall;
 
     @Column
     private String stadium;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Column
+    private int win;
+
+    @Column
+    private int draw;
+
+    @Column
+    private int lose;
+
+    @Column
+    private int score;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
     private League league;
 
-    public Team(String name, String record, int overall, String stadium) {
+    public Team() {}
+
+    public Team(String name, int overall, String stadium, int win, int draw, int lose, int score, League league) {
         this.name = name;
-        this.record = record;
         this.overall = overall;
         this.stadium = stadium;
+        this.win = win;
+        this.draw = draw;
+        this.lose = lose;
+        this.score = score;
+        this.league = league;
     }
 
     public long getId() {
@@ -49,14 +64,6 @@ public class Team implements Serializable {
         this.name = name;
     }
 
-    public String getRecord() {
-        return record;
-    }
-
-    public void setRecord(String record) {
-        this.record = record;
-    }
-
     public int getOverall() {
         return overall;
     }
@@ -71,5 +78,45 @@ public class Team implements Serializable {
 
     public void setStadium(String stadium) {
         this.stadium = stadium;
+    }
+
+    public int getWin() {
+        return win;
+    }
+
+    public void setWin(int win) {
+        this.win = win;
+    }
+
+    public int getDraw() {
+        return draw;
+    }
+
+    public void setDraw(int draw) {
+        this.draw = draw;
+    }
+
+    public int getLose() {
+        return lose;
+    }
+
+    public void setLose(int lose) {
+        this.lose = lose;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public League getLeague() {
+        return league;
+    }
+
+    public void setLeague(League league) {
+        this.league = league;
     }
 }

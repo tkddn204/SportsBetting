@@ -6,7 +6,7 @@ import java.util.Set;
 @Entity
 public class League {
     @Id
-    @Column(name = "player_id")
+    @Column(name = "league_id")
     @GeneratedValue
     private long id;
 
@@ -15,7 +15,9 @@ public class League {
 
     @OneToMany(mappedBy = "league")
     private Set<Team> teamList;
-    
+
+    public League() {}
+
     public League(String name, Set<Team> teamList) {
         this.name = name;
         this.teamList = teamList;

@@ -1,5 +1,8 @@
 package com.ssanggland.views;
 
+import com.ssanggland.DatabaseDAO;
+import com.ssanggland.models.PlayMatch;
+import com.ssanggland.models.Team;
 import com.ssanggland.models.User;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -18,7 +21,12 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.ResourceBundle;
+
+import static com.ssanggland.DatabaseDAO.getRandomPlayMatchList;
 
 public class Controller implements Initializable {
     @FXML
@@ -39,21 +47,30 @@ public class Controller implements Initializable {
     User user;
 
     //DB 데이터 동기화 : 배열에다 데이터 넣으면 됨
-    private String[] homeTeam  = {"KOR", "COR"};
-    private String[] awayTeam = {"JPN", "SER"};
-    private String[] homeDividend = {"1.89","2.22"};
-    private String[] awayDividend = {"1.76","1.58"};
-    private String[] drawDividend = {"2.66","2.34"};
-    private String[] bettingMatchId;
+    private List<PlayMatch> playMatchList;
+//    private ArrayList<String> homeTeam;
+//    private ArrayList<String> awayTeam;
 
     public void infoBtnAction(ActionEvent ae) {
-        matchList = FXCollections.observableArrayList(
-                (new TableDataMatch(new SimpleStringProperty(homeTeam[0] + " vs " + awayTeam[0]),
-                        new SimpleStringProperty(homeDividend[0]), new SimpleStringProperty(drawDividend[0]), new SimpleStringProperty(awayDividend[0])))
-        );
-        for (int i = 1; i < homeTeam.length; i++) {
-            matchList.add((new TableDataMatch(new SimpleStringProperty(homeTeam[i] + " vs " + awayTeam[i]),
-                    new SimpleStringProperty(homeDividend[i]), new SimpleStringProperty(drawDividend[i]), new SimpleStringProperty(awayDividend[i]))));
+//        if(DatabaseDAO.getPlayMatchList() == null) {
+            playMatchList = getRandomPlayMatchList();
+//        } else {
+//            playMatchList = DatabaseDAO.getPlayMatchList();
+//        }
+        matchList = FXCollections.observableArrayList();
+//                new TableDataMatch(new SimpleStringProperty(
+//                        homeTeam.get(0) + " vs " + awayTeam.get(0)),
+//                        new SimpleStringProperty(homeDividend[0]),
+//                        new SimpleStringProperty(drawDividend[0]),
+//                        new SimpleStringProperty(awayDividend[0])));
+        Random random = new Random();
+        for (PlayMatch playMatch : playMatchList) {
+            matchList.add((new TableDataMatch(
+                    new SimpleStringProperty(playMatch.getHomeTeam().getName()
+                            + " vs " + playMatch.getAwayTeam().getName()),
+                    new SimpleStringProperty(String.format("%.2f", random.nextFloat()*10)),
+                    new SimpleStringProperty(String.format("%.2f", random.nextFloat()*10)),
+                    new SimpleStringProperty(String.format("%.2f", random.nextFloat()*10)))));
         }
         matchColumn.setCellValueFactory(cellData -> cellData.getValue().matchProperty());
         homeColumn.setCellValueFactory(cellData -> cellData.getValue().home_dividendProperty());
@@ -64,7 +81,8 @@ public class Controller implements Initializable {
         matchTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if(matchTableView.getSelectionModel().getSelectedItem().matchProperty().getValue().toString().equals(""))
+                if(matchTableView.getSelectionModel().getSelectedItem()
+                        .matchProperty().getValue().toString().equals(""))
                     return;
                 FXMLLoader fxmlLoader = new FXMLLoader();
                 fxmlLoader.setLocation(getClass().getResource("DoBettingView.fxml"));
@@ -78,12 +96,12 @@ public class Controller implements Initializable {
                 Stage stage = new Stage();
                 stage.setScene(new Scene(parent));
                 stage.show();
-                doBettingViewControler.setData(matchTableView.getSelectionModel().getSelectedItem().matchProperty().getValue().toString());
+                doBettingViewControler.setData(
+                        matchTableView.getSelectionModel().getSelectedItem()
+                                .matchProperty().getValue().toString());
             }
         });
     }
-
-
 
     public void resultBtnAction(ActionEvent ae) {
         matchTableView.setOnMouseClicked((MouseEvent event) -> {
@@ -113,6 +131,10 @@ public class Controller implements Initializable {
         this.user = user;
         userName.setText(user.getName());
         userMoney.setText(Long.toString(user.getMoney()));
+    }
+
+    public void loadingInformation() {
+        // TODO: 엑셀파일에서 추출
     }
 }
 

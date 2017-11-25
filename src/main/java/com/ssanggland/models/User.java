@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = "login_id"))
 public class User implements Serializable {
     @Id
     @Column(name = "user_id")
@@ -31,6 +32,8 @@ public class User implements Serializable {
     @Temporal(TemporalType.DATE)
     @Column(name = "create_date")
     private Date createDate = new Date();
+
+    public User() {}
 
     public User(String loginId, String password, String name) {
         this.loginId = loginId;

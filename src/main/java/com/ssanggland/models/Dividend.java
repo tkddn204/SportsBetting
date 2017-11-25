@@ -27,6 +27,8 @@ public class Dividend implements Serializable {
     @OneToMany(mappedBy = "dividend")
     private Set<Betting> bettings = new HashSet<>();
 
+    public Dividend() {}
+
     public Dividend(KindOfDividend kindOfDividend, float dividendRate) {
         this.kindOfDividend = kindOfDividend;
         this.dividendRate = dividendRate;

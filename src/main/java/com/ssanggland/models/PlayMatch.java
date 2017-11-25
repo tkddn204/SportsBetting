@@ -30,6 +30,8 @@ public class PlayMatch implements Serializable {
     @Column(name = "end_game_date")
     private Date endGameDate;
 
+    public PlayMatch() { }
+
     public PlayMatch(Team homeTeam, Team awayTeam, MatchStadium matchStadium, Date kickoffDate, Date endGameDate) {
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;

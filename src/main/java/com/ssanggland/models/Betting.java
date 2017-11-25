@@ -30,6 +30,8 @@ public class Betting implements Serializable {
     @Column(name = "betting_result")
     private String bettingResult;
 
+    public Betting() {}
+
     public Betting(User user, long bettingMoney, Date bettingTime, String bettingResult) {
         this.user = user;
         this.bettingMoney = bettingMoney;

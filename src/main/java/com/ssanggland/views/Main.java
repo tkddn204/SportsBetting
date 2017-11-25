@@ -158,19 +158,19 @@ public class Main extends Application {
                 text_error.setText("Error !");
             }
 
-            if (registerIdCheck(text_registration_id.getText())) {
+            if (registerIdCheck(textfield_registration_id.getText())) {
                 text_error.setText("Error !");
+            } else {
+                registerCommit(textfield_registration_id.getText(),
+                        passwordfield_registration_pwd.getText(),
+                        textField_name.getText());
+                text_error.setText("");
+                textfield_registration_id.setText("");
+                passwordfield_registration_pwd.setText("");
+                textField_name.setText("");
+                window.setScene(login_scene);
+                window.setTitle("Login");
             }
-
-            registerCommit(textfield_registration_id.getText(),
-                    passwordfield_registration_pwd.getText(),
-                    textField_name.getText());
-            text_error.setText("");
-            textfield_registration_id.setText("");
-            passwordfield_registration_pwd.setText("");
-            textField_name.setText("");
-            window.setScene(login_scene);
-            window.setTitle("Login");
         });
 
         // Setting Title Name
@@ -187,10 +187,12 @@ public class Main extends Application {
             Parent parent = loader.load();
             Controller controller = loader.getController();
             controller.setUser(user);
+            controller.loadingInformation();
             Scene main_scene = new Scene(parent);
             window.setScene(main_scene);
             window.setTitle("Give me Money");
             window.show();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
