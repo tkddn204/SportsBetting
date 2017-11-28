@@ -169,10 +169,9 @@ public class DatabaseDAO {
         return resultDividendList;
     }
 
-    public static boolean bettingMoney(int money) {
+    public static boolean bettingMoney(Dividend dividend, int money) {
         Transaction transaction = session.beginTransaction();
         User user = getUser(String.valueOf(LoginSession.getInstance().getSessionUserId()));
-        Dividend dividend = new Dividend();//getDiviend();
         if(user.getMoney() > money) {
             Betting betting = new Betting(user, dividend, money);
             user.setMoney(user.getMoney() - money);
@@ -184,13 +183,6 @@ public class DatabaseDAO {
         }
         transaction.commit();
         return true;
-    }
-
-    private static Dividend getDiviend(PlayMatch playMatch, KindOfDividend kindOfDividend) {
-        Transaction transaction = session.beginTransaction();
-        Dividend dividend = null;
-        transaction.commit();
-        return dividend;
     }
 
     public static void loadLeagueTeamSQL() {
@@ -207,12 +199,14 @@ public class DatabaseDAO {
         transaction.commit();
     }
 
-    public static PlayMatch getPlayMatch() {
+    public static PlayMatch getPlayMatch(long playMatchId) {
         Transaction transaction = session.beginTransaction();
 
-        PlayMatch playMatch = null;
+        Query query = session.createQuery("From PlayMatch playMatch Where playMatch.id = ?");
+        query.setParameter(0, playMatchId);
+        PlayMatch result = (PlayMatch) query.uniqueResult();
 
         transaction.commit();
-        return playMatch;
+        return result;
     }
 }

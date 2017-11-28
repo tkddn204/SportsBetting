@@ -1,19 +1,27 @@
 package com.ssanggland.views;
 
+import javafx.beans.property.LongProperty;
 import javafx.beans.property.StringProperty;
 
 public class TableDataMatch {
 
+    private LongProperty id;
     private StringProperty match;
     private StringProperty home_dividend;
     private StringProperty draw_dividend;
     private StringProperty away_dividend;
 
-    public TableDataMatch(StringProperty match, StringProperty home_dividend, StringProperty draw_dividend, StringProperty away_dividend) {
+    public TableDataMatch(LongProperty id, StringProperty match, StringProperty home_dividend,
+                          StringProperty draw_dividend, StringProperty away_dividend) {
+        this.id = id;
         this.match = match;
         this.home_dividend = home_dividend;
         this.draw_dividend = draw_dividend;
         this.away_dividend = away_dividend;
+    }
+
+    public LongProperty idProperty() {
+        return id;
     }
 
     public StringProperty matchProperty() {

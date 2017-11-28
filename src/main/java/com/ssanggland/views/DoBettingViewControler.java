@@ -1,5 +1,8 @@
 package com.ssanggland.views;
 
+import com.ssanggland.DatabaseDAO;
+import com.ssanggland.models.PlayMatch;
+import com.ssanggland.models.enumtypes.KindOfDividend;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -18,19 +21,27 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import static com.ssanggland.DatabaseDAO.getPlayMatch;
+
 public class DoBettingViewControler implements Initializable{
 
     @FXML
     private Label matchLineUp;
+    @FXML
+    private Label betHomeText;
+    @FXML
+    private Label betDrawText;
+    @FXML
+    private Label betAwayText;
+
+    private PlayMatch playMatch;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        matchLineUp.setPrefWidth(218.0);
-        matchLineUp.setAlignment(Pos.CENTER);
     }
 
     public void BetBtnAction1(ActionEvent actionEvent) {
-        CreateCheckBettingScene();
+        CreateCheckBettingScene(KindOfDividend.WIN);
     }
 
     public void setData(String lineUp) {
@@ -38,25 +49,38 @@ public class DoBettingViewControler implements Initializable{
     }
 
     public void BetBtnAction2(ActionEvent actionEvent) {
-        CreateCheckBettingScene();
+        CreateCheckBettingScene(KindOfDividend.DRAW);
     }
 
 
     public void BetBtnAction3(ActionEvent actionEvent) {
-        CreateCheckBettingScene();
+        CreateCheckBettingScene(KindOfDividend.LOSE);
     }
 
-    protected void CreateCheckBettingScene() {
+    protected void CreateCheckBettingScene(KindOfDividend kindOfDividend) {
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(getClass().getResource("CheckBetting.fxml"));
         try {
             fxmlLoader.load();
+            CheckBettingControler controller = fxmlLoader.getController();
+            controller.setDividend(playMatch.getDividendList().get(kindOfDividend.ordinal()));
         } catch (IOException e) {
+            e.printStackTrace();
         }
         Stage stage = new Stage();
         Parent parent = fxmlLoader.getRoot();
         stage.setScene(new Scene(parent));
         stage.show();
+    }
+
+    public void setPlayMatch(long playMatchId) {
+        playMatch = getPlayMatch(playMatchId);
+        betHomeText.setText(
+                String.format("%.2f", playMatch.getDividendList().get(0).getDividendRate()));
+        betDrawText.setText(
+                String.format("%.2f", playMatch.getDividendList().get(1).getDividendRate()));
+        betAwayText.setText(
+                String.format("%.2f", playMatch.getDividendList().get(2).getDividendRate()));
     }
 }
 

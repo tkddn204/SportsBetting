@@ -10,10 +10,15 @@
             prefHeight="180.0" prefWidth="218.0">
     <children>
         <Label layoutX="67.0" layoutY="10.0" text="Sports Betting !" />
-        <Label layoutX="0.0" layoutY="40.0" fx:id="matchLineUp" textAlignment="CENTER"/>
+        <Label layoutX="10.0" layoutY="40.0" fx:id="matchLineUp" textAlignment="CENTER" prefWidth="218"/>
         <Button layoutX="10.0" layoutY="70.0" text="Home" fx:id="betHomeBtn" onAction="#BetBtnAction1"/>
         <Button layoutX="82.0" layoutY="70.0" text="Draw" fx:id="betDrawBtn" onAction="#BetBtnAction2"/>
         <Button layoutX="150.0" layoutY="70.0" text="Away" fx:id="betAwayBtn" onAction="#BetBtnAction3"/>
+        <Label layoutX="10.0" layoutY="120.0" fx:id="betHomeText" />
+        <Label layoutX="82.0" layoutY="120.0" fx:id="betDrawText" />
+        <Label layoutX="150.0" layoutY="120.0" fx:id="betAwayText" />
+
+
     </children>
 
 </AnchorPane>

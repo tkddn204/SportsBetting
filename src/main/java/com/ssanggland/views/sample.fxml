@@ -18,8 +18,9 @@
         <Button fx:id="infoBtn" layoutX="280.0" layoutY="28.0" onAction="#infoBtnAction" text="경기 정보" />
         <Button fx:id="resultBtn" layoutX="380.0" layoutY="28.0" onAction="#resultBtnAction" text="배팅 결과" />
 
-        <TableView fx:id="matchTableView" layoutX="280.0" layoutY="66.0" prefHeight="500.0" prefWidth="600.0">
+        <TableView fx:id="matchTableView" layoutX="280.0" layoutY="66.0" prefHeight="500.0" prefWidth="635.0">
             <columns>
+                <TableColumn fx:id="idColumn" prefWidth="30.0" text="ID" />
                 <TableColumn fx:id="matchColumn" prefWidth="390.0" text="경기 정보" />
                 <TableColumn fx:id="homeColumn" prefWidth="70.0" text="Home" />
                 <TableColumn fx:id="drawColumn" prefWidth="70.0" text="Draw" />
