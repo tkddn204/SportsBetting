@@ -4,7 +4,7 @@ import com.ssanggland.models.enumtypes.MatchStadium;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.util.*;
 
 @Entity
 public class PlayMatch implements Serializable {
@@ -29,6 +29,9 @@ public class PlayMatch implements Serializable {
 
     @Column(name = "end_game_date")
     private Date endGameDate;
+
+    @OneToMany(mappedBy = "playMatch")
+    private List<Dividend> dividendList = new ArrayList<>();
 
     public PlayMatch() { }
 
@@ -86,5 +89,13 @@ public class PlayMatch implements Serializable {
 
     public void setEndGameDate(Date endGameDate) {
         this.endGameDate = endGameDate;
+    }
+
+    public List<Dividend> getDividendList() {
+        return dividendList;
+    }
+
+    public void setDividendList(List<Dividend> dividendList) {
+        this.dividendList = dividendList;
     }
 }

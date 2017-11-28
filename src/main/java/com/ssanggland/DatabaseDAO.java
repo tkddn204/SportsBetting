@@ -1,10 +1,13 @@
 package com.ssanggland;
 
+import com.ssanggland.models.Dividend;
 import com.ssanggland.models.PlayMatch;
 import com.ssanggland.models.Team;
 import com.ssanggland.models.User;
+import com.ssanggland.models.enumtypes.KindOfDividend;
 import com.ssanggland.models.enumtypes.MatchStadium;
 import com.ssanggland.util.HibernateUtil;
+import com.ssanggland.views.DividendAlgorithm;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -131,5 +134,37 @@ public class DatabaseDAO {
             transaction.commit();
         }
         return resultList;
+    }
+
+    public static List<Dividend> getDiviendList() {
+        Transaction transaction = session.beginTransaction();
+        Query query = session.createQuery("from Dividend");
+        List<Dividend> dividendList = query.list();
+        transaction.commit();
+        return dividendList;
+    }
+
+    public static List<Dividend> getRandomDividendList() {
+        List<PlayMatch> playMatchList = getPlayMatchList();
+        List<Dividend> resultDividendList = getDiviendList();
+        if(resultDividendList.isEmpty()) {
+            Transaction transaction = session.beginTransaction();
+            for (PlayMatch playMatch : playMatchList) {
+                List<Double> dividendList = DividendAlgorithm.calculate(
+                        playMatch.getHomeTeam().getOverall(),
+                        playMatch.getAwayTeam().getOverall());
+                Dividend dividendWin = new Dividend(KindOfDividend.WIN, playMatch,
+                        dividendList.get(0));
+                Dividend dividendDraw = new Dividend(KindOfDividend.DRAW, playMatch,
+                        dividendList.get(1));
+                Dividend dividendLose = new Dividend(KindOfDividend.LOSE, playMatch,
+                        dividendList.get(2));
+                session.save(dividendWin);
+                session.save(dividendDraw);
+                session.save(dividendLose);
+            }
+            transaction.commit();
+        }
+        return resultDividendList;
     }
 }

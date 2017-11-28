@@ -22,15 +22,21 @@ public class Dividend implements Serializable {
     private PlayMatch playMatch;
 
     @Column
-    private float dividendRate;
+    private double dividendRate;
 
     @OneToMany(mappedBy = "dividend")
     private Set<Betting> bettings = new HashSet<>();
 
     public Dividend() {}
 
-    public Dividend(KindOfDividend kindOfDividend, float dividendRate) {
+    public Dividend(KindOfDividend kindOfDividend, double dividendRate) {
         this.kindOfDividend = kindOfDividend;
+        this.dividendRate = dividendRate;
+    }
+
+    public Dividend(KindOfDividend kindOfDividend, PlayMatch playMatch, double dividendRate) {
+        this.kindOfDividend = kindOfDividend;
+        this.playMatch = playMatch;
         this.dividendRate = dividendRate;
     }
 
@@ -50,11 +56,11 @@ public class Dividend implements Serializable {
         this.kindOfDividend = kindOfDividend;
     }
 
-    public float getDividendRate() {
+    public double getDividendRate() {
         return dividendRate;
     }
 
-    public void setDividendRate(float dividendRate) {
+    public void setDividendRate(double dividendRate) {
         this.dividendRate = dividendRate;
     }
 

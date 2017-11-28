@@ -1,6 +1,7 @@
 package com.ssanggland.views;
 
 import com.ssanggland.DatabaseDAO;
+import com.ssanggland.models.Dividend;
 import com.ssanggland.models.PlayMatch;
 import com.ssanggland.models.Team;
 import com.ssanggland.models.User;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.ResourceBundle;
 
+import static com.ssanggland.DatabaseDAO.getRandomDividendList;
 import static com.ssanggland.DatabaseDAO.getRandomPlayMatchList;
 
 public class Controller implements Initializable {
@@ -48,29 +50,25 @@ public class Controller implements Initializable {
 
     //DB 데이터 동기화 : 배열에다 데이터 넣으면 됨
     private List<PlayMatch> playMatchList;
+    private List<Dividend> dividendList;
 //    private ArrayList<String> homeTeam;
 //    private ArrayList<String> awayTeam;
 
     public void infoBtnAction(ActionEvent ae) {
-//        if(DatabaseDAO.getPlayMatchList() == null) {
-            playMatchList = getRandomPlayMatchList();
-//        } else {
-//            playMatchList = DatabaseDAO.getPlayMatchList();
-//        }
+        playMatchList = getRandomPlayMatchList();
+        dividendList = getRandomDividendList();
+
         matchList = FXCollections.observableArrayList();
-//                new TableDataMatch(new SimpleStringProperty(
-//                        homeTeam.get(0) + " vs " + awayTeam.get(0)),
-//                        new SimpleStringProperty(homeDividend[0]),
-//                        new SimpleStringProperty(drawDividend[0]),
-//                        new SimpleStringProperty(awayDividend[0])));
-        Random random = new Random();
         for (PlayMatch playMatch : playMatchList) {
             matchList.add((new TableDataMatch(
                     new SimpleStringProperty(playMatch.getHomeTeam().getName()
                             + " vs " + playMatch.getAwayTeam().getName()),
-                    new SimpleStringProperty(String.format("%.2f", random.nextFloat()*10)),
-                    new SimpleStringProperty(String.format("%.2f", random.nextFloat()*10)),
-                    new SimpleStringProperty(String.format("%.2f", random.nextFloat()*10)))));
+                    new SimpleStringProperty(String.format("%.2f",
+                            playMatch.getDividendList().get(0).getDividendRate())),
+                    new SimpleStringProperty(String.format("%.2f",
+                            playMatch.getDividendList().get(1).getDividendRate())),
+                    new SimpleStringProperty(String.format("%.2f",
+                            playMatch.getDividendList().get(2).getDividendRate())))));
         }
         matchColumn.setCellValueFactory(cellData -> cellData.getValue().matchProperty());
         homeColumn.setCellValueFactory(cellData -> cellData.getValue().home_dividendProperty());
