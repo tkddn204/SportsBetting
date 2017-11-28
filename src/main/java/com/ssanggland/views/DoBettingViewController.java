@@ -1,20 +1,14 @@
 package com.ssanggland.views;
 
-import com.ssanggland.DatabaseDAO;
 import com.ssanggland.models.PlayMatch;
 import com.ssanggland.models.enumtypes.KindOfDividend;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -23,7 +17,7 @@ import java.util.ResourceBundle;
 
 import static com.ssanggland.DatabaseDAO.getPlayMatch;
 
-public class DoBettingViewControler implements Initializable{
+public class DoBettingViewController implements Initializable{
 
     @FXML
     private Label matchLineUp;
@@ -57,12 +51,12 @@ public class DoBettingViewControler implements Initializable{
         CreateCheckBettingScene(KindOfDividend.LOSE);
     }
 
-    protected void CreateCheckBettingScene(KindOfDividend kindOfDividend) {
+    private void CreateCheckBettingScene(KindOfDividend kindOfDividend) {
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(getClass().getResource("CheckBetting.fxml"));
         try {
             fxmlLoader.load();
-            CheckBettingControler controller = fxmlLoader.getController();
+            CheckBettingController controller = fxmlLoader.getController();
             controller.setDividend(playMatch.getDividendList().get(kindOfDividend.ordinal()));
         } catch (IOException e) {
             e.printStackTrace();

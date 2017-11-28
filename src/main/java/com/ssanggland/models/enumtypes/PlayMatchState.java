@@ -1,14 +1,14 @@
 package com.ssanggland.models.enumtypes;
 
-public enum BettingState {
-    YET("대기중"),
-    LOW("실패-낮음"),
-    GOOD("적중"),
-    HIGH("실패-높음");
+public enum PlayMatchState {
+    SOON("경기 시작전"),
+    PROCEED("경기 진행중"),
+    EXTEND("경기 연장됨"),
+    ENDGAME("경기 완료");
 
     private final String description;
 
-    BettingState(String description) {
+    PlayMatchState(String description) {
         this.description = description;
     }
 

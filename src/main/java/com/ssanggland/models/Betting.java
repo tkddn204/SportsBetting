@@ -9,7 +9,6 @@ import java.util.Date;
 @Entity
 public class Betting implements Serializable {
 
-
     @Id
     @Column(name = "betting_id")
     @GeneratedValue
@@ -30,7 +29,7 @@ public class Betting implements Serializable {
     private Date bettingTime = new Date();
 
     @Enumerated(EnumType.STRING)
-    private BettingState bettingResult = BettingState.PROCEED;
+    private BettingState state = BettingState.YET;
 
     public Betting() {}
 
@@ -80,11 +79,11 @@ public class Betting implements Serializable {
         this.bettingTime = bettingTime;
     }
 
-    public BettingState getBettingResult() {
-        return bettingResult;
+    public BettingState getState() {
+        return state;
     }
 
-    public void setBettingResult(BettingState bettingResult) {
-        this.bettingResult = bettingResult;
+    public void setState(BettingState state) {
+        this.state = state;
     }
 }

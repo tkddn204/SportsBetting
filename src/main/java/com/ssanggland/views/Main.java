@@ -1,8 +1,6 @@
 package com.ssanggland.views;
 
-import com.ssanggland.DatabaseDAO;
 import com.ssanggland.models.User;
-import com.ssanggland.util.HibernateUtil;
 import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,16 +9,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 import static com.ssanggland.DatabaseDAO.*;
 
@@ -196,7 +189,7 @@ public class Main extends Application {
                     "sample.fxml"));
             Parent parent = loader.load();
             Controller controller = loader.getController();
-            controller.setUser(user);
+            controller.updateUserInfo(user);
             LoginSession.getInstance().setSessionUserId(user.getId());
             Scene main_scene = new Scene(parent);
             window.setScene(main_scene);

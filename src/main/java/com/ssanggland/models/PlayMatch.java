@@ -1,6 +1,7 @@
 package com.ssanggland.models;
 
 import com.ssanggland.models.enumtypes.MatchStadium;
+import com.ssanggland.models.enumtypes.PlayMatchState;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -24,11 +25,14 @@ public class PlayMatch implements Serializable {
     @Enumerated(EnumType.STRING)
     private MatchStadium matchStadium;
 
-    @Column(name = "kickoff_date")
+    @Column(name = "kick_off_date")
     private Date kickoffDate;
 
     @Column(name = "end_game_date")
     private Date endGameDate;
+
+    @Enumerated(value = EnumType.STRING)
+    private PlayMatchState state = PlayMatchState.SOON;
 
     @OneToMany(mappedBy = "playMatch")
     private List<Dividend> dividendList = new ArrayList<>();
@@ -97,5 +101,13 @@ public class PlayMatch implements Serializable {
 
     public void setDividendList(List<Dividend> dividendList) {
         this.dividendList = dividendList;
+    }
+
+    public PlayMatchState getState() {
+        return state;
+    }
+
+    public void setState(PlayMatchState state) {
+        this.state = state;
     }
 }

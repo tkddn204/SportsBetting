@@ -8,19 +8,20 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 
+<?import javafx.scene.text.Text?>
 <AnchorPane prefHeight="600" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ssanggland.views.Controller">
     <children>
         <Label layoutX="42.0" layoutY="28.0" text="이름 :" />
         <Label layoutX="42.0" layoutY="66.0" text="금액 :" />
         <Label fx:id="userName" layoutX="120.0" layoutY="28.0" />
-        <Label fx:id="userMoney" layoutX="120.0" layoutY="66.0" text="13,947,413원" />
+        <Label fx:id="userMoney" layoutX="120.0" layoutY="66.0" />
         <Button fx:id="infoBtn" layoutX="280.0" layoutY="28.0" onAction="#infoBtnAction" text="경기 정보" />
         <Button fx:id="resultBtn" layoutX="380.0" layoutY="28.0" onAction="#resultBtnAction" text="배팅 결과" />
 
         <TableView fx:id="matchTableView" layoutX="280.0" layoutY="66.0" prefHeight="500.0" prefWidth="635.0">
             <columns>
-                <TableColumn fx:id="idColumn" prefWidth="30.0" text="ID" />
+                <TableColumn fx:id="matchIdColumn" prefWidth="30.0" text="ID" />
                 <TableColumn fx:id="matchColumn" prefWidth="390.0" text="경기 정보" />
                 <TableColumn fx:id="homeColumn" prefWidth="70.0" text="Home" />
                 <TableColumn fx:id="drawColumn" prefWidth="70.0" text="Draw" />
@@ -28,12 +29,14 @@
             </columns>
         </TableView>
 
-        <TableView fx:id="resultTableView" layoutX="280.0" layoutY="66.0" prefHeight="500.0" prefWidth="630.0" visible="false">
+        <TableView fx:id="resultTableView" layoutX="280.0" layoutY="66.0" prefHeight="500.0" prefWidth="635.0" visible="false">
             <columns>
+                <TableColumn fx:id="bettingIdColumn" prefWidth="30.0" text="ID" />
                 <TableColumn fx:id="resultMatchColumn" prefWidth="300.0" text="경기 정보" />
-                <TableColumn fx:id="matchTimeColumn" prefWidth="120.0" text="경기 상황"/>
-                <TableColumn fx:id="battingResultColumn" prefWidth="80.0" text="배팅 결과"/>
-                <TableColumn fx:id="getMoneyColumn" prefWidth="125.0" text="배당금"/>
+                <TableColumn fx:id="matchStateColumn" prefWidth="80.0" text="경기 상황"/>
+                <TableColumn fx:id="battingStateColumn" prefWidth="80.0" text="배팅 결과"/>
+                <TableColumn fx:id="getMoneyColumn" prefWidth="75.0" text="배당금"/>
+                <TableColumn fx:id="resultMoneyColumn" prefWidth="75.0" text="결과금"/>
             </columns>
         </TableView>
         <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="75.0" layoutY="198.0" pickOnBounds="true" preserveRatio="true">

@@ -220,4 +220,12 @@ public class DatabaseDAO {
 
         transaction.commit();
     }
+
+    public static List<Betting> getBettingList() {
+        Transaction transaction = session.beginTransaction();
+        Query query = session.createQuery("from Betting");
+        List<Betting> resultList = query.list();
+        transaction.commit();
+        return resultList;
+    }
 }
