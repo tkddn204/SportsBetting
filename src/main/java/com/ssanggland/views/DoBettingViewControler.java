@@ -52,7 +52,6 @@ public class DoBettingViewControler implements Initializable{
         try {
             fxmlLoader.load();
         } catch (IOException e) {
-
         }
         Stage stage = new Stage();
         Parent parent = fxmlLoader.getRoot();

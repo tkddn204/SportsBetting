@@ -1,17 +1,18 @@
 package com.ssanggland;
 
-import com.ssanggland.models.Dividend;
-import com.ssanggland.models.PlayMatch;
-import com.ssanggland.models.Team;
-import com.ssanggland.models.User;
+import com.ssanggland.models.*;
 import com.ssanggland.models.enumtypes.KindOfDividend;
 import com.ssanggland.models.enumtypes.MatchStadium;
 import com.ssanggland.util.HibernateUtil;
 import com.ssanggland.views.DividendAlgorithm;
+import com.ssanggland.views.LoginSession;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 
 public class DatabaseDAO {
@@ -166,5 +167,52 @@ public class DatabaseDAO {
             transaction.commit();
         }
         return resultDividendList;
+    }
+
+    public static boolean bettingMoney(int money) {
+        Transaction transaction = session.beginTransaction();
+        User user = getUser(String.valueOf(LoginSession.getInstance().getSessionUserId()));
+        Dividend dividend = new Dividend();//getDiviend();
+        if(user.getMoney() > money) {
+            Betting betting = new Betting(user, dividend, money);
+            user.setMoney(user.getMoney() - money);
+            session.update(user);
+            session.save(betting);
+        } else {
+            transaction.commit();
+            return false;
+        }
+        transaction.commit();
+        return true;
+    }
+
+    private static Dividend getDiviend(PlayMatch playMatch, KindOfDividend kindOfDividend) {
+        Transaction transaction = session.beginTransaction();
+        Dividend dividend = null;
+        transaction.commit();
+        return dividend;
+    }
+
+    public static void loadLeagueTeamSQL() {
+        Transaction transaction = session.beginTransaction();
+        String buf;
+        try (BufferedReader bufferedReader = new BufferedReader(
+                new FileReader("leagueTeamList.sql"))){
+            while((buf = bufferedReader.readLine()) != null) {
+                session.createQuery(buf).executeUpdate();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        transaction.commit();
+    }
+
+    public static PlayMatch getPlayMatch() {
+        Transaction transaction = session.beginTransaction();
+
+        PlayMatch playMatch = null;
+
+        transaction.commit();
+        return playMatch;
     }
 }

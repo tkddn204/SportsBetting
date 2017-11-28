@@ -5,6 +5,7 @@ import com.ssanggland.models.Dividend;
 import com.ssanggland.models.PlayMatch;
 import com.ssanggland.models.Team;
 import com.ssanggland.models.User;
+import com.ssanggland.util.HibernateUtil;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,7 +20,12 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -27,6 +33,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.ResourceBundle;
 
+import static com.ssanggland.DatabaseDAO.getLeagueCount;
 import static com.ssanggland.DatabaseDAO.getRandomDividendList;
 import static com.ssanggland.DatabaseDAO.getRandomPlayMatchList;
 
@@ -51,8 +58,6 @@ public class Controller implements Initializable {
     //DB 데이터 동기화 : 배열에다 데이터 넣으면 됨
     private List<PlayMatch> playMatchList;
     private List<Dividend> dividendList;
-//    private ArrayList<String> homeTeam;
-//    private ArrayList<String> awayTeam;
 
     public void infoBtnAction(ActionEvent ae) {
         playMatchList = getRandomPlayMatchList();
@@ -132,7 +137,9 @@ public class Controller implements Initializable {
     }
 
     public void loadingInformation() {
-        // TODO: 엑셀파일에서 추출
+        if(getLeagueCount() < 0) {
+            DatabaseDAO.loadLeagueTeamSQL();
+        }
     }
 }
 

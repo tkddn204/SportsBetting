@@ -1,5 +1,7 @@
 package com.ssanggland.models;
 
+import com.ssanggland.models.enumtypes.BettingState;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -25,18 +27,17 @@ public class Betting implements Serializable {
     private long bettingMoney;
 
     @Temporal(TemporalType.DATE)
-    private Date bettingTime;
+    private Date bettingTime = new Date();
 
-    @Column(name = "betting_result")
-    private String bettingResult;
+    @Enumerated(EnumType.STRING)
+    private BettingState bettingResult = BettingState.PROCEED;
 
     public Betting() {}
 
-    public Betting(User user, long bettingMoney, Date bettingTime, String bettingResult) {
+    public Betting(User user, Dividend dividend, long bettingMoney) {
         this.user = user;
+        this.dividend = dividend;
         this.bettingMoney = bettingMoney;
-        this.bettingTime = bettingTime;
-        this.bettingResult = bettingResult;
     }
 
     public long getId() {
@@ -79,11 +80,11 @@ public class Betting implements Serializable {
         this.bettingTime = bettingTime;
     }
 
-    public String getBettingResult() {
+    public BettingState getBettingResult() {
         return bettingResult;
     }
 
-    public void setBettingResult(String bettingResult) {
+    public void setBettingResult(BettingState bettingResult) {
         this.bettingResult = bettingResult;
     }
 }

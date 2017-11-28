@@ -187,6 +187,7 @@ public class Main extends Application {
             Parent parent = loader.load();
             Controller controller = loader.getController();
             controller.setUser(user);
+            LoginSession.getInstance().setSessionUserId(user.getId());
             controller.loadingInformation();
             Scene main_scene = new Scene(parent);
             window.setScene(main_scene);
