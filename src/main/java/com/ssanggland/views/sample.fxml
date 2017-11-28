@@ -27,6 +27,15 @@
                 <TableColumn fx:id="awayColumn" prefWidth="70.0" text="Away" />
             </columns>
         </TableView>
+
+        <TableView fx:id="resultTableView" layoutX="280.0" layoutY="66.0" prefHeight="500.0" prefWidth="630.0" visible="false">
+            <columns>
+                <TableColumn fx:id="resultMatchColumn" prefWidth="300.0" text="경기 정보" />
+                <TableColumn fx:id="matchTimeColumn" prefWidth="120.0" text="경기 상황"/>
+                <TableColumn fx:id="battingResultColumn" prefWidth="80.0" text="배팅 결과"/>
+                <TableColumn fx:id="getMoneyColumn" prefWidth="125.0" text="배당금"/>
+            </columns>
+        </TableView>
         <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="75.0" layoutY="198.0" pickOnBounds="true" preserveRatio="true">
             <image>
                 <Image url="@19.png" />

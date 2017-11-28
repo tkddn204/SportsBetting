@@ -83,4 +83,3 @@ public class DoBettingViewControler implements Initializable{
                 String.format("%.2f", playMatch.getDividendList().get(2).getDividendRate()));
     }
 }
-

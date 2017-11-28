@@ -35,15 +35,15 @@ public class Main extends Application {
         window = primaryStage;
 
         //creating label ID
-        Text text_id = new Text("ID");
-        Text text_registration_id = new Text("ID");
+        Text text_id = new Text("아이디");
+        Text text_registration_id = new Text("아이디");
 
         //creating label password
-        Text text_pwd = new Text("Password");
-        Text text_registration_pwd = new Text("Password");
+        Text text_pwd = new Text("비밀번호");
+        Text text_registration_pwd = new Text("비밀번호");
 
         //creating label name
-        Text text_name = new Text("Name");
+        Text text_name = new Text("닉네임");
 
         //creating label registration error
         Text text_error = new Text();
@@ -61,16 +61,17 @@ public class Main extends Application {
         TextField textField_name = new TextField();
 
         //creating button login
-        Button button_login = new Button("Login");
+        Button button_login = new Button("로그인");
 
         //creating button exit
-        Button button_exit = new Button("Exit");
+        Button button_exit = new Button("종료");
 
         //creating button sign up
-        Button button_signup = new Button("Sign up");
+        Button button_signup = new Button("회원가입");
 
         //creating button sign up in registration scene
-        Button button_registration_signup = new Button("Sign up(@)");
+        Button button_registration_signup = new Button("가입하기");
+        Button buttonRegistrationBack = new Button("뒤로가기");
 
         /* ********************This is main scene componant****************************/
         //User Information
@@ -83,8 +84,8 @@ public class Main extends Application {
         GridPane registration_gridPane = new GridPane();
 
         //Setting size for the pane
-        gridPane.setMinSize(400, 200);
-        registration_gridPane.setMinSize(400, 300);
+        gridPane.setMinSize(600, 400);
+        registration_gridPane.setMinSize(600, 400);
 
         //Setting the padding
         gridPane.setPadding(new Insets(10, 10, 10, 10));
@@ -101,31 +102,31 @@ public class Main extends Application {
         registration_gridPane.setAlignment(Pos.CENTER);
 
         //Arranging all the nodes in the grid
-        gridPane.add(text_error_login, 3, 0);
-        gridPane.add(text_id, 2, 1);
-        gridPane.add(textfield_ID, 3, 1);
-        gridPane.add(text_pwd, 2, 2);
-        gridPane.add(passwordfield_pwd, 3, 2);
-        gridPane.add(button_signup, 2, 3);
-        gridPane.add(button_login, 3, 3);
+        gridPane.add(text_id, 0, 1);
+        gridPane.add(textfield_ID, 1, 1);
+        gridPane.add(text_pwd, 0, 2);
+        gridPane.add(passwordfield_pwd, 1, 2);
+        gridPane.add(text_error_login, 0, 3);
+        gridPane.add(button_signup, 0, 4);
+        gridPane.add(button_login, 1, 4);
 
         //Arranging all the nodes in the registration grid
-        registration_gridPane.add(text_registration_id, 0, 0);
-        registration_gridPane.add(textfield_registration_id, 1, 0);
-        registration_gridPane.add(text_registration_pwd, 0, 1);
-        registration_gridPane.add(passwordfield_registration_pwd, 1, 1);
-        registration_gridPane.add(text_name, 0, 2);
-        registration_gridPane.add(textField_name, 1, 2);
+        registration_gridPane.add(text_name, 0, 0);
+        registration_gridPane.add(textField_name, 1, 0);
+        registration_gridPane.add(text_registration_id, 0, 1);
+        registration_gridPane.add(textfield_registration_id, 1, 1);
+        registration_gridPane.add(text_registration_pwd, 0, 2);
+        registration_gridPane.add(passwordfield_registration_pwd, 1, 2);
         registration_gridPane.add(text_error, 1, 3);
-        registration_gridPane.add(button_registration_signup, 1, 4);
+        registration_gridPane.add(button_registration_signup, 0, 4);
+        registration_gridPane.add(buttonRegistrationBack, 1, 4);
 
         //Styling nodes
         //button_exit.setStyle("-fx-background-color: darkslateblue; -fx-text-fill: white;");
-        gridPane.setStyle("-fx-background-color: yellow;");
-        registration_gridPane.setStyle("-fx-background-color: yellow;");
         button_login.setStyle("-fx-background-color: darkslateblue; -fx-text-fill: white;");
         button_signup.setStyle("-fx-background-color: darkslateblue; -fx-text-fill: white;");
         button_registration_signup.setStyle("-fx-background-color: darkslateblue; -fx-text-fill: white;");
+        buttonRegistrationBack.setStyle("-fx-background-color: darkslateblue; -fx-text-fill: white;");
         text_error.setStyle("-fx-text-fill: red;");
 
         //Creating a scene object
@@ -134,7 +135,7 @@ public class Main extends Application {
 
         button_signup.setOnAction(e -> {
             window.setScene(registration_scene);
-            window.setTitle("Registration");
+            window.setTitle("회원가입");
         });
 
         button_login.setOnAction(e -> {
@@ -169,12 +170,21 @@ public class Main extends Application {
                 passwordfield_registration_pwd.setText("");
                 textField_name.setText("");
                 window.setScene(login_scene);
-                window.setTitle("Login");
+                window.setTitle("스포츠 배팅 로그인");
             }
         });
 
+        buttonRegistrationBack.setOnAction(e -> {
+            text_error.setText("");
+            textfield_registration_id.setText("");
+            passwordfield_registration_pwd.setText("");
+            textField_name.setText("");
+            window.setScene(login_scene);
+            window.setTitle("스포츠 배팅 로그인");
+        });
+
         // Setting Title Name
-        primaryStage.setTitle("SSangleland");
+        primaryStage.setTitle("스포츠 배팅 로그인");
         primaryStage.setScene(login_scene);
         primaryStage.show();
     }
@@ -188,12 +198,10 @@ public class Main extends Application {
             Controller controller = loader.getController();
             controller.setUser(user);
             LoginSession.getInstance().setSessionUserId(user.getId());
-            controller.loadingInformation();
             Scene main_scene = new Scene(parent);
             window.setScene(main_scene);
-            window.setTitle("Give me Money");
+            window.setTitle("스포츠 배팅");
             window.show();
-
         } catch (Exception e) {
             e.printStackTrace();
         }

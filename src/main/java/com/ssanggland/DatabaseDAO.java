@@ -6,13 +6,12 @@ import com.ssanggland.models.enumtypes.MatchStadium;
 import com.ssanggland.util.HibernateUtil;
 import com.ssanggland.views.DividendAlgorithm;
 import com.ssanggland.views.LoginSession;
+import javafx.scene.control.Alert;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 public class DatabaseDAO {
@@ -54,6 +53,16 @@ public class DatabaseDAO {
         transaction.commit();
         return isExisted;
     }
+
+    public static User getUser(long userId) {
+        Transaction transaction = session.beginTransaction();
+        Query query = session.createQuery("from User u where u.id = ?");
+        query.setParameter(0, userId);
+        User user = (User) query.uniqueResult();
+        transaction.commit();
+        return user;
+    }
+
 
     public static User getUser(String loginId) {
         Transaction transaction = session.beginTransaction();
@@ -169,34 +178,18 @@ public class DatabaseDAO {
         return resultDividendList;
     }
 
-    public static boolean bettingMoney(Dividend dividend, int money) {
-        Transaction transaction = session.beginTransaction();
-        User user = getUser(String.valueOf(LoginSession.getInstance().getSessionUserId()));
-        if(user.getMoney() > money) {
-            Betting betting = new Betting(user, dividend, money);
-            user.setMoney(user.getMoney() - money);
-            session.update(user);
-            session.save(betting);
-        } else {
-            transaction.commit();
+    public static boolean bettingMoney(Dividend dividend, long money) {
+        User user = getUser(LoginSession.getInstance().getSessionUserId());
+        if(user.getMoney() < money) {
             return false;
         }
+        Transaction transaction = session.beginTransaction();
+        Betting betting = new Betting(user, dividend, money);
+        user.setMoney(user.getMoney() - money);
+        session.update(user);
+        session.save(betting);
         transaction.commit();
         return true;
-    }
-
-    public static void loadLeagueTeamSQL() {
-        Transaction transaction = session.beginTransaction();
-        String buf;
-        try (BufferedReader bufferedReader = new BufferedReader(
-                new FileReader("leagueTeamList.sql"))){
-            while((buf = bufferedReader.readLine()) != null) {
-                session.createQuery(buf).executeUpdate();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        transaction.commit();
     }
 
     public static PlayMatch getPlayMatch(long playMatchId) {
@@ -208,5 +201,23 @@ public class DatabaseDAO {
 
         transaction.commit();
         return result;
+    }
+
+    public static void loadLeagueTeamSQL(String sqlFilePath) {
+        Transaction transaction = session.beginTransaction();
+
+        try (BufferedReader bufferedReader = new BufferedReader(
+                new InputStreamReader(new FileInputStream(sqlFilePath),
+                        "UTF-8"))) {
+            String str;
+            while((str = bufferedReader.readLine()) != null) {
+//                System.out.println(str);
+                session.createSQLQuery(str).executeUpdate();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        transaction.commit();
     }
 }
