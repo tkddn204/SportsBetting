@@ -13,7 +13,7 @@ public class League {
     @Column
     private String name;
 
-    @OneToMany(mappedBy = "league")
+    @OneToMany(mappedBy = "league", cascade = CascadeType.ALL)
     private Set<Team> teamList;
 
     public League() {}

@@ -14,7 +14,7 @@ public class Betting implements Serializable {
     @GeneratedValue
     private long id;
 
-    @ManyToOne(cascade = CascadeType.DETACH)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private User user;
 

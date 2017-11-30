@@ -15,6 +15,9 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.util.logging.Handler;
+import java.util.logging.Logger;
+
 import static com.ssanggland.DatabaseDAO.*;
 
 public class Main extends Application {
@@ -176,6 +179,11 @@ public class Main extends Application {
             window.setTitle("스포츠 배팅 로그인");
         });
 
+        if (getLeagueCount() <= 0) {
+            loadLeagueTeamSQL(getClass().getClassLoader()
+                    .getResource("leagueTeamList.sql").getPath());
+        }
+
         // Setting Title Name
         primaryStage.setTitle("스포츠 배팅 로그인");
         primaryStage.setScene(login_scene);
@@ -191,6 +199,7 @@ public class Main extends Application {
             Controller controller = loader.getController();
             controller.updateUserInfo(user);
             LoginSession.getInstance().setSessionUserId(user.getId());
+
             Scene main_scene = new Scene(parent);
             window.setScene(main_scene);
             window.setTitle("스포츠 배팅");

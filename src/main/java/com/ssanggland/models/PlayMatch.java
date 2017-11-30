@@ -26,10 +26,10 @@ public class PlayMatch implements Serializable {
     private MatchStadium matchStadium;
 
     @Column(name = "kick_off_date")
-    private Date kickoffDate;
+    private Date kickoffDate = new Date();
 
     @Column(name = "end_game_date")
-    private Date endGameDate;
+    private Date endGameDate = new Date();
 
     @Enumerated(value = EnumType.STRING)
     private PlayMatchState state = PlayMatchState.SOON;
@@ -38,6 +38,12 @@ public class PlayMatch implements Serializable {
     private List<Dividend> dividendList = new ArrayList<>();
 
     public PlayMatch() { }
+
+    public PlayMatch(Team homeTeam, Team awayTeam, MatchStadium matchStadium) {
+        this.homeTeam = homeTeam;
+        this.awayTeam = awayTeam;
+        this.matchStadium = matchStadium;
+    }
 
     public PlayMatch(Team homeTeam, Team awayTeam, MatchStadium matchStadium, Date kickoffDate, Date endGameDate) {
         this.homeTeam = homeTeam;

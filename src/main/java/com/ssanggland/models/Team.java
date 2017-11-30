@@ -32,7 +32,7 @@ public class Team implements Serializable {
     @Column
     private int score;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private League league;
 
     public Team() {}

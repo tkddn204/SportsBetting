@@ -62,8 +62,8 @@ public class CheckBettingController implements Initializable {
     }
 
     private void updateMainWindow() {
-        FXMLLoader fxmlLoader = new FXMLLoader();
-        fxmlLoader.setLocation(getClass().getResource("sample.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(
+                getClass().getResource("sample.fxml"));
         try {
             fxmlLoader.load();
         } catch (IOException e) {

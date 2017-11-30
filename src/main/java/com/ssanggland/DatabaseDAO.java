@@ -6,12 +6,12 @@ import com.ssanggland.models.enumtypes.MatchStadium;
 import com.ssanggland.util.HibernateUtil;
 import com.ssanggland.views.DividendAlgorithm;
 import com.ssanggland.views.LoginSession;
-import javafx.scene.control.Alert;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class DatabaseDAO {
@@ -82,9 +82,21 @@ public class DatabaseDAO {
         return result;
     }
 
-    public static List<PlayMatch> getPlayMatchList() {
+    public static List<PlayMatch> getPlayMatchList(Calendar cal) {
         Transaction transaction = session.beginTransaction();
-        Query query = session.createQuery("from PlayMatch");
+        Query query = session.createQuery("from PlayMatch as playMatch" +
+                " where playMatch.kickoffDate between :from and :to");
+
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 1);
+        query.setDate("from", cal.getTime());
+
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        query.setDate("to", cal.getTime());
+
         List<PlayMatch> playMatchList = query.list();
         transaction.commit();
         return playMatchList;
@@ -113,67 +125,65 @@ public class DatabaseDAO {
         return resultTeamList;
     }
 
-    public static PlayMatch makeRandomPlayMatch() {
+    public static PlayMatch makeRandomPlayMatch(Calendar cal) {
         long randomLeagueId = new Random().nextInt(getLeagueCount().intValue());
         List<Team> randomTeamList = getRandomTeams(randomLeagueId);
 
-        Calendar calendar = Calendar.getInstance();
         Random random = new Random();
-        Date startDate = calendar.getTime();
-        calendar.add(Calendar.DATE, random.nextInt(10)+1);
-        calendar.add(Calendar.HOUR_OF_DAY, random.nextInt(24));
-        calendar.add(Calendar.SECOND, random.nextInt(60));
-        Date endDate = calendar.getTime();
+        cal.set(Calendar.HOUR_OF_DAY, random.nextInt(24));
+        cal.set(Calendar.MINUTE, random.nextInt(60));
+//        Date startDate = cal.getTime();
+//        Date endDate = cal.getTime();
 
         PlayMatch playMatch = new PlayMatch(randomTeamList.get(0),
                 randomTeamList.get(1),
                 MatchStadium.randomMatchStadium(),
-                startDate, endDate);
-        session.save(playMatch);
+                cal.getTime(), cal.getTime());
         return playMatch;
     }
 
-    public static List<PlayMatch> getRandomPlayMatchList() {
-        List<PlayMatch> resultList = getPlayMatchList();
-        if(resultList.isEmpty()) {
-            Transaction transaction = session.beginTransaction();
-            for (int i = 0; i < 20; i++) {
-                makeRandomPlayMatch();
+    public static void getRandomPlayMatchList(Calendar cal) {
+        Transaction transaction = session.beginTransaction();
+        Random random = new Random();
+        int matchCount = random.nextInt(15)+5;
+        for (int i = 0; i < matchCount; i++) {
+            PlayMatch playMatch = makeRandomPlayMatch(cal);
+            playMatch.setDividendList(makeRandomDividendList(playMatch));
+            session.save(playMatch);
+            if ( i % (matchCount / 3) == 0 ) { //20, same as the JDBC batch size
+                //flush a batch of inserts and release memory:
+                session.flush();
+                session.clear();
             }
-            resultList = getPlayMatchList();
-            transaction.commit();
         }
-        return resultList;
+        transaction.commit();
     }
 
-    public static List<Dividend> getDiviendList() {
+    public static List<Dividend> getDiviendList(PlayMatch playMatch) {
         Transaction transaction = session.beginTransaction();
-        Query query = session.createQuery("from Dividend");
+        Query query = session.createQuery("from Dividend dividend" +
+                " where dividend.playMatch = ?");
+        query.setParameter(0, playMatch);
         List<Dividend> dividendList = query.list();
         transaction.commit();
         return dividendList;
     }
 
-    public static List<Dividend> getRandomDividendList() {
-        List<PlayMatch> playMatchList = getPlayMatchList();
-        List<Dividend> resultDividendList = getDiviendList();
+    public static List<Dividend> makeRandomDividendList(PlayMatch playMatch) {
+        List<Dividend> resultDividendList = getDiviendList(playMatch);
         if(resultDividendList.isEmpty()) {
-            Transaction transaction = session.beginTransaction();
-            for (PlayMatch playMatch : playMatchList) {
-                List<Double> dividendList = DividendAlgorithm.calculate(
-                        playMatch.getHomeTeam().getOverall(),
-                        playMatch.getAwayTeam().getOverall());
-                Dividend dividendWin = new Dividend(KindOfDividend.WIN, playMatch,
-                        dividendList.get(0));
-                Dividend dividendDraw = new Dividend(KindOfDividend.DRAW, playMatch,
-                        dividendList.get(1));
-                Dividend dividendLose = new Dividend(KindOfDividend.LOSE, playMatch,
-                        dividendList.get(2));
-                session.save(dividendWin);
-                session.save(dividendDraw);
-                session.save(dividendLose);
-            }
-            transaction.commit();
+            List<Double> dividendList = DividendAlgorithm.calculate(
+                    playMatch.getHomeTeam().getOverall(),
+                    playMatch.getAwayTeam().getOverall());
+            Dividend dividendWin = new Dividend(KindOfDividend.WIN, playMatch,
+                    dividendList.get(0));
+            Dividend dividendDraw = new Dividend(KindOfDividend.DRAW, playMatch,
+                    dividendList.get(1));
+            Dividend dividendLose = new Dividend(KindOfDividend.LOSE, playMatch,
+                    dividendList.get(2));
+            session.save(dividendWin);
+            session.save(dividendDraw);
+            session.save(dividendLose);
         }
         return resultDividendList;
     }
@@ -227,5 +237,26 @@ public class DatabaseDAO {
         List<Betting> resultList = query.list();
         transaction.commit();
         return resultList;
+    }
+
+    public static boolean chargeMoney(long userId, int money) {
+        Transaction transaction = session.beginTransaction();
+        Query query = session.createQuery("from User u where u.id = ?");
+        query.setParameter(0, userId);
+        User user = (User) query.uniqueResult();
+        if(user != null) {
+            user.setMoney(user.getMoney() + money);
+            session.update(user);
+            transaction.commit();
+            return true;
+        } else {
+            transaction.commit();
+            return false;
+        }
+    }
+
+    public static void deleteBetting() {
+        Transaction transaction = session.beginTransaction();
+        transaction.commit();
     }
 }

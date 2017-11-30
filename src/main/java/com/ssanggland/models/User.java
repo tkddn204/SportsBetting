@@ -26,7 +26,7 @@ public class User implements Serializable {
     @Column(nullable = false)
     private long money = 1000L;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.DETACH)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<Betting> bettings = new HashSet<>();
 
     @Temporal(TemporalType.DATE)

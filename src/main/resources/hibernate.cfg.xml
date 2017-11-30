@@ -18,9 +18,9 @@
 
     <property name="hibernate.hbm2ddl.auto">update</property>
 
-    <property name="hibernate.show_sql">true</property>
-    <property name="hibernate.format_sql">true</property>
-    <property name="hibernate.use_sql_comments">true</property>
+    <property name="hibernate.show_sql">false</property>
+    <property name="hibernate.format_sql">false</property>
+    <property name="hibernate.use_sql_comments">false</property>
 
     <mapping class="com.ssanggland.models.Betting" />
     <mapping class="com.ssanggland.models.Dividend" />

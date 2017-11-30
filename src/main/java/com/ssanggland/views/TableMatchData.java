@@ -3,7 +3,7 @@ package com.ssanggland.views;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.StringProperty;
 
-public class TableDataMatch {
+public class TableMatchData {
 
     private LongProperty matchId;
     private StringProperty match;
@@ -11,7 +11,7 @@ public class TableDataMatch {
     private StringProperty draw_dividend;
     private StringProperty away_dividend;
 
-    public TableDataMatch(LongProperty matchId, StringProperty match, StringProperty home_dividend,
+    public TableMatchData(LongProperty matchId, StringProperty match, StringProperty home_dividend,
                           StringProperty draw_dividend, StringProperty away_dividend) {
         this.matchId = matchId;
         this.match = match;

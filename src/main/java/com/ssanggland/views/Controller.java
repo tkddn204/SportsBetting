@@ -1,7 +1,7 @@
 package com.ssanggland.views;
 
+import com.ssanggland.DatabaseDAO;
 import com.ssanggland.models.Betting;
-import com.ssanggland.models.Dividend;
 import com.ssanggland.models.PlayMatch;
 import com.ssanggland.models.User;
 import javafx.beans.property.SimpleLongProperty;
@@ -19,13 +19,13 @@ import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Calendar;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -39,22 +39,22 @@ public class Controller implements Initializable {
     protected Label userMoney;
 
 
-    ObservableList<TableDataMatch> matchObservableList;
+    ObservableList<TableMatchData> matchObservableList;
     ObservableList<BettingMatchData> resultObservableList;
 
     @FXML
-    private TableView<TableDataMatch> matchTableView;
+    private TableView<TableMatchData> matchTableView;
 
     @FXML
-    private TableColumn<TableDataMatch, Number> matchIdColumn;
+    private TableColumn<TableMatchData, Number> matchIdColumn;
     @FXML
-    private TableColumn<TableDataMatch, String> matchColumn;
+    private TableColumn<TableMatchData, String> matchColumn;
     @FXML
-    private TableColumn<TableDataMatch, String> homeColumn;
+    private TableColumn<TableMatchData, String> homeColumn;
     @FXML
-    private TableColumn<TableDataMatch, String> drawColumn;
+    private TableColumn<TableMatchData, String> drawColumn;
     @FXML
-    private TableColumn<TableDataMatch, String> awayColumn;
+    private TableColumn<TableMatchData, String> awayColumn;
 
 
     @FXML
@@ -72,12 +72,15 @@ public class Controller implements Initializable {
     private TableColumn<BettingMatchData, Number> getMoneyColumn;
     @FXML
     private TableColumn<BettingMatchData, Number> resultMoneyColumn;
+    @FXML
+    private Label times;
+
+    private Calendar cal = Calendar.getInstance();
 
     private User user;
 
     //DB 데이터 동기화 : 배열에다 데이터 넣으면 됨
     private List<PlayMatch> playMatchList;
-    private List<Dividend> dividendList;
 
     private List<Betting> bettingList;
 
@@ -96,18 +99,31 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // loadingProgress();
-         new Thread(() -> {
-             try {
-                 Thread.sleep(500);
-                 loadingInformation();
-             } catch (InterruptedException ie) {
-                 ie.printStackTrace();
-             }
+        setTimes(cal.get(Calendar.YEAR) + "년 "
+                + (cal.get(Calendar.MONTH) + 1) + "월 "
+                + cal.get(Calendar.DATE) + "일");
+                new Thread(() -> {
+            try {
+                Thread.sleep(500);
+                for(int i = 0; i < 10 ; i++) {
+                    getRandomPlayMatchList(cal);
+                    cal.add(Calendar.DATE, 1);
+                }
+                cal = Calendar.getInstance();
+
+                loadingResultTable();
+                loadingMatchTable();
+
+            } catch (InterruptedException ie) {
+                ie.printStackTrace();
+            }
             //loadingDialog.close();
-         }).start();
+        }).start();
+        loadingInformation();
     }
 
     private Dialog<Void> loadingDialog = new Dialog<>();
+
     private void loadingProgress() {
         loadingDialog.initModality(Modality.WINDOW_MODAL);
 //        loadingDialog.initOwner();
@@ -133,12 +149,11 @@ public class Controller implements Initializable {
     }
 
     public void loadingMatchTable() {
-        playMatchList = getRandomPlayMatchList();
-        dividendList = getRandomDividendList();
+        List<PlayMatch> playMatchList = getPlayMatchList(cal);
 
         matchObservableList = FXCollections.observableArrayList();
         for (PlayMatch playMatch : playMatchList) {
-            matchObservableList.add((new TableDataMatch(
+            matchObservableList.add((new TableMatchData(
                     new SimpleLongProperty(playMatch.getId()),
                     new SimpleStringProperty(playMatch.getHomeTeam().getName()
                             + " vs " + playMatch.getAwayTeam().getName()),
@@ -155,14 +170,15 @@ public class Controller implements Initializable {
         drawColumn.setCellValueFactory(cellData -> cellData.getValue().draw_dividendProperty());
         awayColumn.setCellValueFactory(cellData -> cellData.getValue().away_dividendProperty());
 
-        matchTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        matchTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         matchTableView.setItems(matchObservableList);
     }
 
     public void loadingResultTable() {
         bettingList = getBettingList();
+
         resultObservableList = FXCollections.observableArrayList();
-        if(!bettingList.isEmpty()) {
+        if (!bettingList.isEmpty()) {
             for (Betting betting : bettingList) {
                 resultObservableList.add((new BettingMatchData(
                         new SimpleLongProperty(betting.getId()),
@@ -182,22 +198,16 @@ public class Controller implements Initializable {
         getMoneyColumn.setCellValueFactory(cellData -> cellData.getValue().bettingMoneyProperty());
         resultMoneyColumn.setCellValueFactory(cellData -> cellData.getValue().bettingResultMoneyProperty());
 
-        resultTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        resultTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         resultTableView.setItems(resultObservableList);
     }
 
     public void loadingInformation() {
-        if(getLeagueCount() <= 0) {
-            loadLeagueTeamSQL(getClass().getClassLoader()
-                    .getResource("leagueTeamList.sql").getPath());
-        }
-        loadingResultTable();
-        loadingMatchTable();
 
         matchTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if(matchTableView.getSelectionModel().getSelectedItem()
+                if (matchTableView.getSelectionModel().getSelectedItem()
                         .matchProperty().getValue().toString().equals(""))
                     return;
                 FXMLLoader fxmlLoader = new FXMLLoader();
@@ -226,12 +236,53 @@ public class Controller implements Initializable {
         resultTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if(resultTableView.getSelectionModel().getSelectedItem()
+                if (resultTableView.getSelectionModel().getSelectedItem()
                         .bettingMatchProperty().getValue().toString().equals(""))
                     return;
                 // TODO : 결과 테이블 클릭했을 때
             }
         });
+    }
+
+    public void chargeBtnAction(ActionEvent actionEvent) {
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        fxmlLoader.setLocation(getClass().getResource("ChargeMoneyScene.fxml"));
+        try {
+            fxmlLoader.load();
+        } catch (IOException e) {
+            Alert.AlertType.INFORMATION.toString();
+        }
+//        ChargeMoneySceneController chargeMoneySceneController = fxmlLoader.getController();
+        Parent parent = fxmlLoader.getRoot();
+        Stage stage = new Stage();
+        stage.setScene(new Scene(parent));
+        stage.show();
+    }
+
+    public void setTimes(String tm) {
+        times.setText(tm);
+    }
+
+    public void nextBtnAction(ActionEvent actionEvent) {
+        setTimes(nextDate());
+        nextSchedule();
+    }
+
+    private String nextDate() {
+        cal.add(Calendar.DATE, 1);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        return cal.get(Calendar.YEAR) + "년 "
+                + (cal.get(Calendar.MONTH) + 1) + "월 "
+                + cal.get(Calendar.DATE) + "일";
+    }
+
+    private void nextSchedule() {
+        loadingMatchTable();
+        DatabaseDAO.deleteBetting();
+        //이틀 지난건 리스트에서 삭제누르지 않아도 자동으로 삭제, 로그에 결과 따로 저장
+        //
     }
 }
 

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="200.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/8.0.121"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ssanggland.views.DeleteListViewController">
+    <Label fx:id="dlvResultLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="109.0" layoutY="36.0" text="MatchResult" />
+    <Label fx:id="betSucLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="99.0" layoutY="55.0" text="bettingSuccess?" />
+    <Label fx:id="betMoneyLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="102.0" layoutY="77.0" text="bettingMoney!" />
+    <Label alignment="CENTER" contentDisplay="CENTER" layoutX="29.0" layoutY="106.0" text="다음 결과 목록을 삭제하시겠습니까?" />
+    <Button fx:id="deleteListBtn" layoutX="68.0" layoutY="136.0" onAction="#deleteListBtnAction" text="삭제" />
+    <Button fx:id="cancleDelListBtn" layoutX="163.0" layoutY="136.0" onAction="#cancelListBtnAction" text="취소" />
+</AnchorPane>
