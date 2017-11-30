@@ -9,6 +9,7 @@ import com.ssanggland.views.LoginSession;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -73,13 +74,13 @@ public class DatabaseDAO {
         return user;
     }
 
+    public static Long leagueCount = 0L;
     public static Long getLeagueCount() {
         Transaction transaction = session.beginTransaction();
         Query query = session.createQuery("select count(*) from League league");
-        Long result = (Long) query.uniqueResult();
-        System.out.println(result);
+        leagueCount = (Long) query.uniqueResult();
         transaction.commit();
-        return result;
+        return leagueCount;
     }
 
     public static List<PlayMatch> getPlayMatchList(Calendar cal) {
@@ -90,12 +91,12 @@ public class DatabaseDAO {
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 1);
-        query.setDate("from", cal.getTime());
+        query.setTimestamp("from", cal.getTime());
 
         cal.set(Calendar.HOUR_OF_DAY, 23);
         cal.set(Calendar.MINUTE, 59);
         cal.set(Calendar.SECOND, 59);
-        query.setDate("to", cal.getTime());
+        query.setTimestamp("to", cal.getTime());
 
         List<PlayMatch> playMatchList = query.list();
         transaction.commit();
@@ -105,7 +106,7 @@ public class DatabaseDAO {
     public static List<Team> getRandomTeams(long randomLeagueId) {
         Random random = new Random();
         Query query = session.createQuery("from Team team" +
-                                            " where team.league.id = ?");
+                " where team.league.id = ?");
         query.setParameter(0, randomLeagueId);
         List<Team> teamList = query.list();
 
@@ -119,14 +120,14 @@ public class DatabaseDAO {
         //어웨이팀
         do {
             randomTeamId = random.nextInt(teamList.size());
-        } while(homeTeam.getId() == randomTeamId);
+        } while (homeTeam.getId() == randomTeamId);
         resultTeamList.add(teamList.get(randomTeamId));
 
         return resultTeamList;
     }
 
     public static PlayMatch makeRandomPlayMatch(Calendar cal) {
-        long randomLeagueId = new Random().nextInt(getLeagueCount().intValue());
+        long randomLeagueId = new Random().nextInt(leagueCount.intValue());
         List<Team> randomTeamList = getRandomTeams(randomLeagueId);
 
         Random random = new Random();
@@ -145,12 +146,12 @@ public class DatabaseDAO {
     public static void getRandomPlayMatchList(Calendar cal) {
         Transaction transaction = session.beginTransaction();
         Random random = new Random();
-        int matchCount = random.nextInt(15)+5;
+        int matchCount = random.nextInt(15) + 5;
         for (int i = 0; i < matchCount; i++) {
             PlayMatch playMatch = makeRandomPlayMatch(cal);
             playMatch.setDividendList(makeRandomDividendList(playMatch));
             session.save(playMatch);
-            if ( i % (matchCount / 3) == 0 ) { //20, same as the JDBC batch size
+            if (i % (matchCount / 3) == 0) { //20, same as the JDBC batch size
                 //flush a batch of inserts and release memory:
                 session.flush();
                 session.clear();
@@ -160,18 +161,16 @@ public class DatabaseDAO {
     }
 
     public static List<Dividend> getDiviendList(PlayMatch playMatch) {
-        Transaction transaction = session.beginTransaction();
         Query query = session.createQuery("from Dividend dividend" +
-                " where dividend.playMatch = ?");
-        query.setParameter(0, playMatch);
+                " where dividend.playMatch.id = ?");
+        query.setParameter(0, playMatch.getId());
         List<Dividend> dividendList = query.list();
-        transaction.commit();
         return dividendList;
     }
 
     public static List<Dividend> makeRandomDividendList(PlayMatch playMatch) {
         List<Dividend> resultDividendList = getDiviendList(playMatch);
-        if(resultDividendList.isEmpty()) {
+        if (resultDividendList.isEmpty()) {
             List<Double> dividendList = DividendAlgorithm.calculate(
                     playMatch.getHomeTeam().getOverall(),
                     playMatch.getAwayTeam().getOverall());
@@ -181,6 +180,7 @@ public class DatabaseDAO {
                     dividendList.get(1));
             Dividend dividendLose = new Dividend(KindOfDividend.LOSE, playMatch,
                     dividendList.get(2));
+            session.flush();
             session.save(dividendWin);
             session.save(dividendDraw);
             session.save(dividendLose);
@@ -190,7 +190,7 @@ public class DatabaseDAO {
 
     public static boolean bettingMoney(Dividend dividend, long money) {
         User user = getUser(LoginSession.getInstance().getSessionUserId());
-        if(user.getMoney() < money) {
+        if (user.getMoney() < money) {
             return false;
         }
         Transaction transaction = session.beginTransaction();
@@ -220,7 +220,7 @@ public class DatabaseDAO {
                 new InputStreamReader(new FileInputStream(sqlFilePath),
                         "UTF-8"))) {
             String str;
-            while((str = bufferedReader.readLine()) != null) {
+            while ((str = bufferedReader.readLine()) != null) {
 //                System.out.println(str);
                 session.createSQLQuery(str).executeUpdate();
             }
@@ -244,7 +244,7 @@ public class DatabaseDAO {
         Query query = session.createQuery("from User u where u.id = ?");
         query.setParameter(0, userId);
         User user = (User) query.uniqueResult();
-        if(user != null) {
+        if (user != null) {
             user.setMoney(user.getMoney() + money);
             session.update(user);
             transaction.commit();

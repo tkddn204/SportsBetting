@@ -34,7 +34,7 @@ public class PlayMatch implements Serializable {
     @Enumerated(value = EnumType.STRING)
     private PlayMatchState state = PlayMatchState.SOON;
 
-    @OneToMany(mappedBy = "playMatch")
+    @OneToMany(mappedBy = "playMatch", cascade = CascadeType.ALL)
     private List<Dividend> dividendList = new ArrayList<>();
 
     public PlayMatch() { }

@@ -179,7 +179,7 @@ public class Main extends Application {
             window.setTitle("스포츠 배팅 로그인");
         });
 
-        if (getLeagueCount() <= 0) {
+        if (getLeagueCount() < 1) {
             loadLeagueTeamSQL(getClass().getClassLoader()
                     .getResource("leagueTeamList.sql").getPath());
         }
