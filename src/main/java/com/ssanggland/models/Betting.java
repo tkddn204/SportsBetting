@@ -39,6 +39,13 @@ public class Betting implements Serializable {
         this.bettingMoney = bettingMoney;
     }
 
+    public Betting(User user, Dividend dividend, long bettingMoney, Date bettingTime) {
+        this.user = user;
+        this.dividend = dividend;
+        this.bettingMoney = bettingMoney;
+        this.bettingTime = bettingTime;
+    }
+
     public long getId() {
         return id;
     }

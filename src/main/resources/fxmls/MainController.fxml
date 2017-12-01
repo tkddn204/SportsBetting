@@ -8,16 +8,17 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 
+<?import javafx.scene.text.Text?>
 <AnchorPane prefHeight="600" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ssanggland.views.Controller">
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ssanggland.controllers.MainController">
     <children>
         <Label layoutX="42.0" layoutY="28.0" text="이름 :" />
         <Label layoutX="42.0" layoutY="66.0" text="금액 :" />
-        <Label fx:id="userName" layoutX="120.0" layoutY="28.0" />
-        <Label fx:id="userMoney" layoutX="120.0" layoutY="66.0" />
+        <Text fx:id="userName" layoutX="120.0" layoutY="42.0"/>
+        <Text fx:id="userMoney" layoutX="120.0" layoutY="81.0" />
         <Button fx:id="infoBtn" layoutX="280.0" layoutY="28.0" onAction="#infoBtnAction" text="경기 정보" />
         <Button fx:id="resultBtn" layoutX="380.0" layoutY="28.0" onAction="#resultBtnAction" text="배팅 결과" />
-        <Label fx:id="times" layoutX="561.0" layoutY="33.0" text="Time" />
+        <Text fx:id="times" layoutX="561.0" layoutY="48.0" text="Time" />
         <Button fx:id="nextBtn" layoutX="895.0" layoutY="23.0" onAction="#nextBtnAction" text="진행하기" />
         <Button fx:id="chargeBtn" layoutX="99.0" layoutY="112.0" onAction="#chargeBtnAction" text="충전하기" />
 
@@ -43,12 +44,12 @@
         </TableView>
         <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="75.0" layoutY="198.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@19.png" />
+                <Image url="@../static/19.png" />
             </image>
         </ImageView>
         <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="75.0" layoutY="391.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@gambling.jpg" />
+                <Image url="@../static/gambling.jpg" />
             </image>
         </ImageView>
 

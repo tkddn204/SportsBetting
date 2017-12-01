@@ -1,24 +1,26 @@
-package com.ssanggland.views;
+package com.ssanggland.controllers;
 
 import com.ssanggland.models.Dividend;
+import com.ssanggland.Main;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.scene.control.TextField;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 import static com.ssanggland.DatabaseDAO.bettingMoney;
 import static com.ssanggland.DatabaseDAO.getUser;
 
-public class CheckBettingController implements Initializable {
+public class InputBettingMoneyController implements Initializable {
 
     @FXML
     private AnchorPane checkBettingPane;
@@ -30,13 +32,14 @@ public class CheckBettingController implements Initializable {
     private Dividend clickedDividend;
 
     public void betCheckBtnClickEvent(ActionEvent actionEvent) {
+        if(betCheckBtn.getText().toString().equals("")) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("오류");
+            alert.setHeaderText(null);
+            alert.setContentText("배당금을 입력해주세요.");
+        }
+
         try {
-            if(betCheckBtn.getText().toString().equals("")) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("금액 빈칸");
-                alert.setHeaderText(null);
-                alert.setContentText("배당금을 입력해주세요.");
-            }
             boolean isBettingSuccess = bettingMoney(clickedDividend,
                     Long.parseLong(textfieldBet.getText()));
             if (isBettingSuccess) {
@@ -44,11 +47,9 @@ public class CheckBettingController implements Initializable {
                 alert.setTitle("배팅 완료");
                 alert.setHeaderText(null);
                 alert.setContentText("배팅이 정상적으로 완료되었습니다.");
-                alert.setOnHiding(event -> {
-                    updateMainWindow();
-                    closeWindow();
-                });
+                updateMainWindow();
                 alert.showAndWait();
+                closeWindow();
             } else {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("현금 부족");
@@ -57,23 +58,29 @@ public class CheckBettingController implements Initializable {
                 alert.showAndWait();
             }
         } catch (NumberFormatException e) {
-            System.out.println(textfieldBet.getText());
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("숫자가 아닙니다.");
+            alert.setHeaderText(null);
+            alert.setContentText("숫자만 입력해주세요!");
+            alert.showAndWait();
         }
     }
 
     private void updateMainWindow() {
-        FXMLLoader fxmlLoader = new FXMLLoader(
-                getClass().getResource("sample.fxml"));
         try {
-            fxmlLoader.load();
-        } catch (IOException e) {
-            new Alert(Alert.AlertType.ERROR).show();
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().
+                    getResource("fxmls/MainController.fxml"));
+            Parent parent = loader.load();
+            MainController mainController = loader.getController();
+            mainController.updateUserInfo(getUser());
+
+            Scene main_scene = new Scene(parent);
+            Main.window.setScene(main_scene);
+            Main.window.setTitle("스포츠 배팅");
+            Main.window.show();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        Controller controller = fxmlLoader.getController();
-        controller.updateUserInfo(
-                getUser(LoginSession.getInstance().getSessionUserId()));
-        controller.loadingMatchTable();
-        controller.loadingResultTable();
     }
 
     @Override

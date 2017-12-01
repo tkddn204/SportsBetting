@@ -1,4 +1,4 @@
-package com.ssanggland.views;
+package com.ssanggland.util;
 
 public class LoginSession {
 

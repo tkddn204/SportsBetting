@@ -6,7 +6,7 @@
 <?import javafx.scene.text.Text?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.ssanggland.views.DoBettingViewController"
+            fx:controller="com.ssanggland.controllers.DoBettingViewController"
             prefHeight="180.0" prefWidth="218.0">
     <children>
         <Label layoutX="67.0" layoutY="10.0" text="Sports Betting !" />

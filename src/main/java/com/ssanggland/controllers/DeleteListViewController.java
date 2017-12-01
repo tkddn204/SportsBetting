@@ -1,4 +1,4 @@
-package com.ssanggland.views;
+package com.ssanggland.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

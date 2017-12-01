@@ -1,4 +1,4 @@
-package com.ssanggland.views;
+package com.ssanggland.controllers;
 
 import com.ssanggland.models.PlayMatch;
 import com.ssanggland.models.enumtypes.KindOfDividend;
@@ -46,17 +46,17 @@ public class DoBettingViewController implements Initializable{
         CreateCheckBettingScene(KindOfDividend.DRAW);
     }
 
-
     public void BetBtnAction3(ActionEvent actionEvent) {
         CreateCheckBettingScene(KindOfDividend.LOSE);
     }
 
     private void CreateCheckBettingScene(KindOfDividend kindOfDividend) {
         FXMLLoader fxmlLoader = new FXMLLoader();
-        fxmlLoader.setLocation(getClass().getResource("CheckBetting.fxml"));
+        fxmlLoader.setLocation(getClass().getClassLoader()
+                .getResource("fxmls/InputBettingMoney.fxml"));
         try {
             fxmlLoader.load();
-            CheckBettingController controller = fxmlLoader.getController();
+            InputBettingMoneyController controller = fxmlLoader.getController();
             controller.setDividend(playMatch.getDividendList().get(kindOfDividend.ordinal()));
         } catch (IOException e) {
             e.printStackTrace();

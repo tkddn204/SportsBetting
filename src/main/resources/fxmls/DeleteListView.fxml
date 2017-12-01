@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 
 <AnchorPane prefHeight="200.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/8.0.121"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ssanggland.views.DeleteListViewController">
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ssanggland.controllers.DeleteListViewController">
     <Label fx:id="dlvResultLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="109.0" layoutY="36.0" text="MatchResult" />
     <Label fx:id="betSucLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="99.0" layoutY="55.0" text="bettingSuccess?" />
     <Label fx:id="betMoneyLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="102.0" layoutY="77.0" text="bettingMoney!" />

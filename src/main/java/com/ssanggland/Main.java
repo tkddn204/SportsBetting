@@ -1,6 +1,8 @@
-package com.ssanggland.views;
+package com.ssanggland;
 
+import com.ssanggland.controllers.MainController;
 import com.ssanggland.models.User;
+import com.ssanggland.util.LoginSession;
 import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,14 +17,14 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.util.logging.Handler;
-import java.util.logging.Logger;
+import java.util.Calendar;
 
 import static com.ssanggland.DatabaseDAO.*;
 
 public class Main extends Application {
 
-    Stage window;
+    public static Stage window;
+    public static Calendar cal = Calendar.getInstance();
     Scene login_scene, registration_scene;
 
 
@@ -179,9 +181,13 @@ public class Main extends Application {
             window.setTitle("스포츠 배팅 로그인");
         });
 
-        if (getLeagueCount() < 1) {
-            loadLeagueTeamSQL(getClass().getClassLoader()
-                    .getResource("leagueTeamList.sql").getPath());
+        if (getLeagueCount() < 1L) {
+            loadLeagueTeamSQL(getClass().getClassLoader().
+                    getResource("leagueTeamList.sql").getPath());
+            if (getPlayMatchList(cal).isEmpty()) {
+                getRandomPlayMatchList(cal);
+                cal = Calendar.getInstance();
+            }
         }
 
         // Setting Title Name
@@ -191,13 +197,13 @@ public class Main extends Application {
     }
 
     @FXML
-    private void initUser(User user) {
+    public void initUser(User user) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(
-                    "sample.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().
+                    getResource("fxmls/MainController.fxml"));
             Parent parent = loader.load();
-            Controller controller = loader.getController();
-            controller.updateUserInfo(user);
+            MainController mainController = loader.getController();
+            mainController.updateUserInfo(user);
             LoginSession.getInstance().setSessionUserId(user.getId());
 
             Scene main_scene = new Scene(parent);

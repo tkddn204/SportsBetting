@@ -1,4 +1,4 @@
-package com.ssanggland.views;
+package com.ssanggland.algorithms;
 
 import java.util.Scanner;
 

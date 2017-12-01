@@ -3,17 +3,18 @@ package com.ssanggland;
 import com.ssanggland.models.*;
 import com.ssanggland.models.enumtypes.KindOfDividend;
 import com.ssanggland.models.enumtypes.MatchStadium;
+import com.ssanggland.models.enumtypes.PlayMatchState;
 import com.ssanggland.util.HibernateUtil;
-import com.ssanggland.views.DividendAlgorithm;
-import com.ssanggland.views.LoginSession;
+import com.ssanggland.algorithms.DividendAlgorithm;
+import com.ssanggland.util.LoginSession;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.resource.transaction.spi.TransactionStatus;
 
 import java.io.*;
-import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static com.ssanggland.Main.cal;
 
 public class DatabaseDAO {
     private static Session session;
@@ -55,10 +56,10 @@ public class DatabaseDAO {
         return isExisted;
     }
 
-    public static User getUser(long userId) {
+    public static User getUser() {
         Transaction transaction = session.beginTransaction();
         Query query = session.createQuery("from User u where u.id = ?");
-        query.setParameter(0, userId);
+        query.setParameter(0, LoginSession.getInstance().getSessionUserId());
         User user = (User) query.uniqueResult();
         transaction.commit();
         return user;
@@ -74,12 +75,14 @@ public class DatabaseDAO {
         return user;
     }
 
-    public static Long leagueCount = 0L;
-    public static Long getLeagueCount() {
-        Transaction transaction = session.beginTransaction();
-        Query query = session.createQuery("select count(*) from League league");
-        leagueCount = (Long) query.uniqueResult();
-        transaction.commit();
+    private static long leagueCount = 0L;
+    public static long getLeagueCount() {
+        if(leagueCount == 0L) {
+            Transaction transaction = session.beginTransaction();
+            Query query = session.createQuery("select count(*) from League league");
+            leagueCount = (long) query.uniqueResult();
+            transaction.commit();
+        }
         return leagueCount;
     }
 
@@ -103,7 +106,7 @@ public class DatabaseDAO {
         return playMatchList;
     }
 
-    public static List<Team> getRandomTeams(long randomLeagueId) {
+    public static List<Team> makeRandomTeams(long randomLeagueId) {
         Random random = new Random();
         Query query = session.createQuery("from Team team" +
                 " where team.league.id = ?");
@@ -127,8 +130,8 @@ public class DatabaseDAO {
     }
 
     public static PlayMatch makeRandomPlayMatch(Calendar cal) {
-        long randomLeagueId = new Random().nextInt(leagueCount.intValue());
-        List<Team> randomTeamList = getRandomTeams(randomLeagueId);
+        long randomLeagueId = new Random().nextInt(leagueCount == 0L ? 6 : (int)leagueCount);
+        List<Team> randomTeamList = makeRandomTeams(randomLeagueId);
 
         Random random = new Random();
         cal.set(Calendar.HOUR_OF_DAY, random.nextInt(24));
@@ -145,17 +148,20 @@ public class DatabaseDAO {
 
     public static void getRandomPlayMatchList(Calendar cal) {
         Transaction transaction = session.beginTransaction();
-        Random random = new Random();
-        int matchCount = random.nextInt(15) + 5;
-        for (int i = 0; i < matchCount; i++) {
-            PlayMatch playMatch = makeRandomPlayMatch(cal);
-            playMatch.setDividendList(makeRandomDividendList(playMatch));
-            session.save(playMatch);
-            if (i % (matchCount / 3) == 0) { //20, same as the JDBC batch size
-                //flush a batch of inserts and release memory:
-                session.flush();
-                session.clear();
+        for(int day = 0; day < 10; day++) {
+            Random random = new Random();
+            int matchCount = random.nextInt(15) + 5;
+            for (int i = 0; i < matchCount; i++) {
+                PlayMatch playMatch = makeRandomPlayMatch(cal);
+                playMatch.setDividendList(makeRandomDividendList(playMatch));
+                session.save(playMatch);
+                if (i % (matchCount / 3) == 0) { //20, same as the JDBC batch size
+                    //flush a batch of inserts and release memory:
+                    session.flush();
+                    session.clear();
+                }
             }
+            cal.add(Calendar.DATE, 1);
         }
         transaction.commit();
     }
@@ -180,7 +186,6 @@ public class DatabaseDAO {
                     dividendList.get(1));
             Dividend dividendLose = new Dividend(KindOfDividend.LOSE, playMatch,
                     dividendList.get(2));
-            session.flush();
             session.save(dividendWin);
             session.save(dividendDraw);
             session.save(dividendLose);
@@ -189,12 +194,12 @@ public class DatabaseDAO {
     }
 
     public static boolean bettingMoney(Dividend dividend, long money) {
-        User user = getUser(LoginSession.getInstance().getSessionUserId());
+        User user = getUser();
         if (user.getMoney() < money) {
             return false;
         }
         Transaction transaction = session.beginTransaction();
-        Betting betting = new Betting(user, dividend, money);
+        Betting betting = new Betting(user, dividend, money, cal.getTime());
         user.setMoney(user.getMoney() - money);
         session.update(user);
         session.save(betting);
@@ -227,7 +232,6 @@ public class DatabaseDAO {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         transaction.commit();
     }
 
@@ -239,24 +243,34 @@ public class DatabaseDAO {
         return resultList;
     }
 
-    public static boolean chargeMoney(long userId, int money) {
-        Transaction transaction = session.beginTransaction();
-        Query query = session.createQuery("from User u where u.id = ?");
-        query.setParameter(0, userId);
-        User user = (User) query.uniqueResult();
+    public static boolean chargeMoney(long money) {
+        User user = getUser();
         if (user != null) {
+            Transaction transaction = session.beginTransaction();
             user.setMoney(user.getMoney() + money);
             session.update(user);
             transaction.commit();
             return true;
         } else {
-            transaction.commit();
             return false;
         }
     }
 
-    public static void deleteBetting() {
+    public static void deleteBettingAndEarnUserMoney() {
+        User user = getUser();
         Transaction transaction = session.beginTransaction();
+        Set<Betting> bettings = user.getBettings();
+        bettings.forEach((betting) -> {
+            if(cal.after(betting.getDividend().getPlayMatch().getEndGameDate())) {
+                if(betting.getDividend().getPlayMatch().getState().equals(PlayMatchState.ENDGAME)) {
+                    long earnMoney = (long) (betting.getBettingMoney() * betting.getDividend().getDividendRate());
+                    user.setMoney(user.getMoney() + earnMoney);
+                }
+                if (cal.getTime().getTime() > betting.getBettingTime().getTime() + 172800000L) {
+                    session.delete(betting);
+                }
+            }
+        });
         transaction.commit();
     }
 }

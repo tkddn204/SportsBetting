@@ -1,4 +1,4 @@
-package com.ssanggland.views;
+package com.ssanggland.controllers.Datas;
 
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.StringProperty;
