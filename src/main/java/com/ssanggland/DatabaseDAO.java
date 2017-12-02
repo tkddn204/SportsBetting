@@ -1,6 +1,8 @@
 package com.ssanggland;
 
+import com.ssanggland.algorithms.ScoreAlgorithm;
 import com.ssanggland.models.*;
+import com.ssanggland.models.enumtypes.BettingState;
 import com.ssanggland.models.enumtypes.KindOfDividend;
 import com.ssanggland.models.enumtypes.MatchStadium;
 import com.ssanggland.models.enumtypes.PlayMatchState;
@@ -56,28 +58,34 @@ public class DatabaseDAO {
         return isExisted;
     }
 
+    private static User user;
+
     public static User getUser() {
-        Transaction transaction = session.beginTransaction();
-        Query query = session.createQuery("from User u where u.id = ?");
-        query.setParameter(0, LoginSession.getInstance().getSessionUserId());
-        User user = (User) query.uniqueResult();
-        transaction.commit();
+        if (user == null) {
+            Transaction transaction = session.beginTransaction();
+            Query query = session.createQuery("from User u where u.id = ?");
+            query.setParameter(0, LoginSession.getInstance().getSessionUserId());
+            user = (User) query.uniqueResult();
+            transaction.commit();
+        }
         return user;
     }
 
-
     public static User getUser(String loginId) {
-        Transaction transaction = session.beginTransaction();
-        Query query = session.createQuery("from User u where u.loginId = ?");
-        query.setParameter(0, loginId);
-        User user = (User) query.uniqueResult();
-        transaction.commit();
+        if (user == null) {
+            Transaction transaction = session.beginTransaction();
+            Query query = session.createQuery("from User u where u.loginId = ?");
+            query.setParameter(0, loginId);
+            user = (User) query.uniqueResult();
+            transaction.commit();
+        }
         return user;
     }
 
     private static long leagueCount = 0L;
+
     public static long getLeagueCount() {
-        if(leagueCount == 0L) {
+        if (leagueCount == 0L) {
             Transaction transaction = session.beginTransaction();
             Query query = session.createQuery("select count(*) from League league");
             leagueCount = (long) query.uniqueResult();
@@ -130,7 +138,7 @@ public class DatabaseDAO {
     }
 
     public static PlayMatch makeRandomPlayMatch(Calendar cal) {
-        long randomLeagueId = new Random().nextInt(leagueCount == 0L ? 6 : (int)leagueCount);
+        long randomLeagueId = new Random().nextInt(leagueCount == 0L ? 6 : (int) leagueCount);
         List<Team> randomTeamList = makeRandomTeams(randomLeagueId);
 
         Random random = new Random();
@@ -148,11 +156,12 @@ public class DatabaseDAO {
 
     public static void getRandomPlayMatchList(Calendar cal) {
         Transaction transaction = session.beginTransaction();
-        for(int day = 0; day < 10; day++) {
+        for (int day = 0; day < 10; day++) {
             Random random = new Random();
             int matchCount = random.nextInt(15) + 5;
             for (int i = 0; i < matchCount; i++) {
                 PlayMatch playMatch = makeRandomPlayMatch(cal);
+                playMatch.setPlayMatchResult(new PlayMatchResult(playMatch, -1, -1));
                 playMatch.setDividendList(makeRandomDividendList(playMatch));
                 session.save(playMatch);
                 if (i % (matchCount / 3) == 0) { //20, same as the JDBC batch size
@@ -180,11 +189,11 @@ public class DatabaseDAO {
             List<Double> dividendList = DividendAlgorithm.calculate(
                     playMatch.getHomeTeam().getOverall(),
                     playMatch.getAwayTeam().getOverall());
-            Dividend dividendWin = new Dividend(KindOfDividend.WIN, playMatch,
+            Dividend dividendWin = new Dividend(KindOfDividend.HOME, playMatch,
                     dividendList.get(0));
             Dividend dividendDraw = new Dividend(KindOfDividend.DRAW, playMatch,
                     dividendList.get(1));
-            Dividend dividendLose = new Dividend(KindOfDividend.LOSE, playMatch,
+            Dividend dividendLose = new Dividend(KindOfDividend.AWAY, playMatch,
                     dividendList.get(2));
             session.save(dividendWin);
             session.save(dividendDraw);
@@ -200,6 +209,7 @@ public class DatabaseDAO {
         }
         Transaction transaction = session.beginTransaction();
         Betting betting = new Betting(user, dividend, money, cal.getTime());
+        betting.setBettingResult(new BettingResult(betting, 0));
         user.setMoney(user.getMoney() - money);
         session.update(user);
         session.save(betting);
@@ -236,8 +246,12 @@ public class DatabaseDAO {
     }
 
     public static List<Betting> getBettingList() {
+        User user = getUser();
         Transaction transaction = session.beginTransaction();
-        Query query = session.createQuery("from Betting");
+        Query query = session.createQuery("from Betting betting" +
+                " where betting.user.id = ? and betting.dividend.playMatch.state != ?");
+        query.setParameter(0, user.getId());
+        query.setParameter(1, PlayMatchState.ENDGAME);
         List<Betting> resultList = query.list();
         transaction.commit();
         return resultList;
@@ -256,21 +270,122 @@ public class DatabaseDAO {
         }
     }
 
-    public static void deleteBettingAndEarnUserMoney() {
+    public static void updatePlayMatchState() {
+        Transaction transaction = session.beginTransaction();
+        Query query = session.createQuery("from PlayMatch playMatch" +
+                " where playMatch.endGameDate <= ? and playMatch.state != ?");
+        query.setTimestamp(0, cal.getTime());
+        query.setParameter(1, PlayMatchState.ENDGAME);
+        List<PlayMatch> playMatchList = query.list();
+        for (PlayMatch playMatch : playMatchList) {
+            if (new Random().nextInt(10) > 0) {
+                playMatch.setState(PlayMatchState.ENDGAME);
+            } else {
+                playMatch.setState(PlayMatchState.EXTEND);
+            }
+            session.update(playMatch);
+            if(playMatch.getId() % 3 == 0) {
+                session.flush();
+            }
+        }
+        transaction.commit();
+    }
+
+    public static boolean isAlreadyBet(long playMatchId) {
+//        User user = getUser();
+        Transaction transaction = session.beginTransaction();
+//        Query query = session.createQuery("select * from Betting betting" +
+//                " where betting.user = ?");
+//        query.setParameter(0, user);
+//        List<Betting> bettingList = query.list();
+//        for(Betting betting : bettingList) {
+//            if(betting.getDividend().getPlayMatch().getId() == playMatchId) {
+//                return false;
+//            }
+//        }
+
+        Query query = session.createQuery("select count(*) from Betting betting" +
+                " where betting.dividend.playMatch.id = ?");
+        query.setParameter(0, playMatchId);
+        Long result = (Long)query.uniqueResult();
+        transaction.commit();
+        return result > 0L;
+    }
+
+    public static List<Betting> getResultBettingList() {
+        Transaction transaction = session.beginTransaction();
+        Query query = session.createQuery("from Betting betting" +
+                " where betting.user.id = ? and betting.dividend.playMatch.state = ?");
+        query.setParameter(0, LoginSession.getInstance().getSessionUserId());
+        query.setParameter(1, PlayMatchState.ENDGAME);
+        List<Betting> resultBettingList = query.list();
+        transaction.commit();
+        return resultBettingList;
+    }
+
+    public static void updateMatchResultScore(PlayMatch playMatch, int[] scores) {
+        playMatch.getPlayMatchResult().setHomeScore(scores[0]);
+        playMatch.getPlayMatchResult().setAwayScore(scores[1]);
+        session.update(playMatch);
+    }
+
+    public static void updateBettingStateAndcreateBettingResult(Betting betting, long resultMoney) {
+        betting.getBettingResult().setResultMoney(resultMoney);
+        if(resultMoney == 0L) {
+            betting.setState(BettingState.FAIL);
+        } else {
+            betting.setState(BettingState.GOOD);
+        }
+        session.update(betting);
+    }
+
+    public static void makeRandomPlayMatchResult() {
+        List<Betting> bettingList = getResultBettingList();
+        Transaction transaction = session.beginTransaction();
+        for (Betting betting : bettingList) {
+            Dividend dividend = betting.getDividend();
+            PlayMatch playMatch = dividend.getPlayMatch();
+            Team homeTeam = playMatch.getHomeTeam();
+            Team awayTeam = playMatch.getAwayTeam();
+
+            // 아직 배팅결과가 안나왔으면 결과를 만듬
+            if (betting.getState().equals(BettingState.YET)) {
+                // 경기 결과 점수 (0 - home, 1 - away)
+                int[] scores = ScoreAlgorithm.calculate(
+                        homeTeam.getOverall(), awayTeam.getOverall());
+
+                updateMatchResultScore(playMatch, scores);
+
+                KindOfDividend matchKindOfDividend = scores[0] == scores[1] ? KindOfDividend.DRAW :
+                        scores[0] > scores[1] ? KindOfDividend.HOME : KindOfDividend.AWAY;
+                long resultMoney = dividend.getKindOfDividend().equals(matchKindOfDividend) ?
+                        (long) (betting.getBettingMoney() * dividend.getDividendRate()) : 0L;
+
+                updateBettingStateAndcreateBettingResult(betting, resultMoney);
+            }
+        }
+        transaction.commit();
+    }
+
+    public static List<Betting> getEarnMoneyBettingList() {
         User user = getUser();
         Transaction transaction = session.beginTransaction();
-        Set<Betting> bettings = user.getBettings();
-        bettings.forEach((betting) -> {
-            if(cal.after(betting.getDividend().getPlayMatch().getEndGameDate())) {
-                if(betting.getDividend().getPlayMatch().getState().equals(PlayMatchState.ENDGAME)) {
-                    long earnMoney = (long) (betting.getBettingMoney() * betting.getDividend().getDividendRate());
-                    user.setMoney(user.getMoney() + earnMoney);
-                }
-                if (cal.getTime().getTime() > betting.getBettingTime().getTime() + 172800000L) {
-                    session.delete(betting);
-                }
-            }
-        });
+        Query query = session.createQuery("from Betting betting" +
+                " where betting.user.id = ? and" +
+                " betting.bettingResult.isPaid = ?");
+
+        query.setParameter(0, user.getId());
+        query.setParameter(1, false);
+
+        List<Betting> bettingList = query.list();
+        transaction.commit();
+        return bettingList;
+    }
+
+    public static void updateBettingResultIsPaid(Betting betting, boolean isPaid) {
+        Transaction transaction = session.beginTransaction();
+        betting.getBettingResult().setPaid(true);
+        session.update(betting);
         transaction.commit();
     }
 }

@@ -4,6 +4,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -27,7 +28,7 @@ public class User implements Serializable {
     private long money = 1000L;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<Betting> bettings = new HashSet<>();
+    private List<Betting> bettings;
 
     @Temporal(TemporalType.DATE)
     @Column(name = "create_date")
@@ -81,11 +82,11 @@ public class User implements Serializable {
         this.money = money;
     }
 
-    public Set<Betting> getBettings() {
+    public List<Betting> getBettings() {
         return bettings;
     }
 
-    public void setBettings(Set<Betting> bettings) {
+    public void setBettings(List<Betting> bettings) {
         this.bettings = bettings;
     }
 

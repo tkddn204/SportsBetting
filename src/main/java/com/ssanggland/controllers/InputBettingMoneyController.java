@@ -71,9 +71,6 @@ public class InputBettingMoneyController implements Initializable {
             FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().
                     getResource("fxmls/MainController.fxml"));
             Parent parent = loader.load();
-            MainController mainController = loader.getController();
-            mainController.updateUserInfo(getUser());
-
             Scene main_scene = new Scene(parent);
             Main.window.setScene(main_scene);
             Main.window.setTitle("스포츠 배팅");

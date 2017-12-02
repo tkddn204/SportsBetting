@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 
 <?import javafx.scene.text.Text?>
-<AnchorPane prefHeight="600" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121"
+<AnchorPane prefHeight="600" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.121"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ssanggland.controllers.MainController">
     <children>
         <Label layoutX="42.0" layoutY="28.0" text="이름 :" />
@@ -17,29 +17,32 @@
         <Text fx:id="userName" layoutX="120.0" layoutY="42.0"/>
         <Text fx:id="userMoney" layoutX="120.0" layoutY="81.0" />
         <Button fx:id="infoBtn" layoutX="280.0" layoutY="28.0" onAction="#infoBtnAction" text="경기 정보" />
-        <Button fx:id="resultBtn" layoutX="380.0" layoutY="28.0" onAction="#resultBtnAction" text="배팅 결과" />
-        <Text fx:id="times" layoutX="561.0" layoutY="48.0" text="Time" />
-        <Button fx:id="nextBtn" layoutX="895.0" layoutY="23.0" onAction="#nextBtnAction" text="진행하기" />
+        <Button fx:id="resultBtn" layoutX="380.0" layoutY="28.0" onAction="#bettingBtnAction" text="배팅 정보" />
+        <Text fx:id="timeText" layoutX="600.0" layoutY="48.0" />
+        <Button fx:id="nextBtn" layoutX="945.0" layoutY="23.0" onAction="#nextBtnAction" text="진행하기" />
+        <Button fx:id="resultBtn" layoutX="1045.0" layoutY="23.0" onAction="#resultBtnAction" text="결과보기" />
         <Button fx:id="chargeBtn" layoutX="99.0" layoutY="112.0" onAction="#chargeBtnAction" text="충전하기" />
 
-        <TableView fx:id="matchTableView" layoutX="280.0" layoutY="66.0" prefHeight="500.0" prefWidth="635.0">
+        <TableView fx:id="matchTableView" layoutX="280.0" layoutY="66.0" prefHeight="500.0" prefWidth="810.0">
             <columns>
-                <TableColumn fx:id="matchIdColumn" prefWidth="30.0" text="ID" />
-                <TableColumn fx:id="matchColumn" prefWidth="390.0" text="경기 정보" />
+                <TableColumn fx:id="matchIdColumn" prefWidth="40.0" text="ID" />
+                <TableColumn fx:id="matchColumn" prefWidth="420.0" text="경기 정보" />
+                <TableColumn fx:id="matchStateColumn" prefWidth="110.0" text="경기상황"/>
                 <TableColumn fx:id="homeColumn" prefWidth="70.0" text="Home" />
                 <TableColumn fx:id="drawColumn" prefWidth="70.0" text="Draw" />
                 <TableColumn fx:id="awayColumn" prefWidth="70.0" text="Away" />
             </columns>
         </TableView>
 
-        <TableView fx:id="resultTableView" layoutX="280.0" layoutY="66.0" prefHeight="500.0" prefWidth="635.0" visible="false">
+        <TableView fx:id="bettingTableView" layoutX="280.0" layoutY="66.0" prefHeight="500.0" prefWidth="810.0" visible="false">
             <columns>
-                <TableColumn fx:id="bettingIdColumn" prefWidth="30.0" text="ID" />
-                <TableColumn fx:id="resultMatchColumn" prefWidth="300.0" text="경기 정보" />
-                <TableColumn fx:id="matchStateColumn" prefWidth="80.0" text="경기 상황"/>
-                <TableColumn fx:id="battingStateColumn" prefWidth="80.0" text="배팅 결과"/>
-                <TableColumn fx:id="getMoneyColumn" prefWidth="75.0" text="배팅액"/>
-                <TableColumn fx:id="resultMoneyColumn" prefWidth="75.0" text="배당금"/>
+                <TableColumn fx:id="bettingIdColumn" prefWidth="40.0" text="ID" />
+                <TableColumn fx:id="bettingMatchColumn" prefWidth="300.0" text="경기정보" />
+                <TableColumn fx:id="bettingMatchStateColumn" prefWidth="90.0" text="경기상황"/>
+                <TableColumn fx:id="bettingMatchDateColumn" prefWidth="120.0" text="경기진행날짜"/>
+                <TableColumn fx:id="bettingStateColumn" prefWidth="80.0" text="배팅 결과"/>
+                <TableColumn fx:id="bettingMoneyColumn" prefWidth="75.0" text="배팅액"/>
+                <TableColumn fx:id="expectMoneyColumn" prefWidth="100.0" text="예상배당금"/>
             </columns>
         </TableView>
         <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="75.0" layoutY="198.0" pickOnBounds="true" preserveRatio="true">

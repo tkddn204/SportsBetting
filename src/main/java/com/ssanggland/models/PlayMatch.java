@@ -37,6 +37,11 @@ public class PlayMatch implements Serializable {
     @OneToMany(mappedBy = "playMatch", cascade = CascadeType.ALL)
     private List<Dividend> dividendList = new ArrayList<>();
 
+    @OneToOne(mappedBy = "playMatch", cascade = CascadeType.ALL)
+    @MapsId
+    @JoinColumn(name="match_id")
+    private PlayMatchResult playMatchResult;
+
     public PlayMatch() { }
 
     public PlayMatch(Team homeTeam, Team awayTeam, MatchStadium matchStadium) {
@@ -115,5 +120,13 @@ public class PlayMatch implements Serializable {
 
     public void setState(PlayMatchState state) {
         this.state = state;
+    }
+
+    public PlayMatchResult getPlayMatchResult() {
+        return playMatchResult;
+    }
+
+    public void setPlayMatchResult(PlayMatchResult playMatchResult) {
+        this.playMatchResult = playMatchResult;
     }
 }

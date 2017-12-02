@@ -4,8 +4,9 @@ import com.ssanggland.DatabaseDAO;
 import com.ssanggland.models.Betting;
 import com.ssanggland.models.PlayMatch;
 import com.ssanggland.models.User;
-import com.ssanggland.controllers.Datas.BettingMatchData;
-import com.ssanggland.controllers.Datas.TableMatchData;
+import com.ssanggland.controllers.Datas.BettingTableData;
+import com.ssanggland.controllers.Datas.MatchTableData;
+import com.ssanggland.models.enumtypes.BettingState;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -28,6 +29,7 @@ import javafx.stage.StageStyle;
 
 import java.io.IOException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -42,40 +44,44 @@ public class MainController implements Initializable {
     @FXML
     protected Text userMoney;
 
-    ObservableList<TableMatchData> matchObservableList;
-    ObservableList<BettingMatchData> resultObservableList;
+    ObservableList<MatchTableData> matchObservableList;
+    ObservableList<BettingTableData> bettingObservableList;
 
     @FXML
-    private TableView<TableMatchData> matchTableView;
+    private TableView<MatchTableData> matchTableView;
 
     @FXML
-    private TableColumn<TableMatchData, Number> matchIdColumn;
+    private TableColumn<MatchTableData, Number> matchIdColumn;
     @FXML
-    private TableColumn<TableMatchData, String> matchColumn;
+    private TableColumn<MatchTableData, String> matchColumn;
     @FXML
-    private TableColumn<TableMatchData, String> homeColumn;
+    private TableColumn<MatchTableData, String> matchStateColumn;
     @FXML
-    private TableColumn<TableMatchData, String> drawColumn;
+    private TableColumn<MatchTableData, String> homeColumn;
     @FXML
-    private TableColumn<TableMatchData, String> awayColumn;
+    private TableColumn<MatchTableData, String> drawColumn;
+    @FXML
+    private TableColumn<MatchTableData, String> awayColumn;
 
     @FXML
-    private TableView<BettingMatchData> resultTableView;
+    private TableView<BettingTableData> bettingTableView;
 
     @FXML
-    private TableColumn<BettingMatchData, Number> bettingIdColumn;
+    private TableColumn<BettingTableData, Number> bettingIdColumn;
     @FXML
-    private TableColumn<BettingMatchData, String> resultMatchColumn;
+    private TableColumn<BettingTableData, String> bettingMatchColumn;
     @FXML
-    private TableColumn<BettingMatchData, String> matchStateColumn;
+    private TableColumn<BettingTableData, String> bettingMatchStateColumn;
     @FXML
-    private TableColumn<BettingMatchData, String> battingStateColumn;
+    private TableColumn<BettingTableData, String> bettingStateColumn;
     @FXML
-    private TableColumn<BettingMatchData, Number> getMoneyColumn;
+    private TableColumn<BettingTableData, String> bettingMatchDateColumn;
     @FXML
-    private TableColumn<BettingMatchData, Number> resultMoneyColumn;
+    private TableColumn<BettingTableData, Number> bettingMoneyColumn;
     @FXML
-    private Text times;
+    private TableColumn<BettingTableData, Number> expectMoneyColumn;
+    @FXML
+    private Text timeText;
 
     //DB 데이터 동기화 : 배열에다 데이터 넣으면 됨
 //    private List<PlayMatch> playMatchList;
@@ -86,20 +92,20 @@ public class MainController implements Initializable {
         changeTableView(true, false);
     }
 
-    public void resultBtnAction(ActionEvent ae) {
+    public void bettingBtnAction(ActionEvent ae) {
         loadingResultTable();
         changeTableView(false, true);
     }
 
     public void changeTableView(boolean match, boolean result) {
         matchTableView.setVisible(match);
-        resultTableView.setVisible(result);
+        bettingTableView.setVisible(result);
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // loadingProgress();
-        setTimes(cal.get(Calendar.YEAR) + "년 "
+        setTimeText(cal.get(Calendar.YEAR) + "년 "
                 + (cal.get(Calendar.MONTH) + 1) + "월 "
                 + cal.get(Calendar.DATE) + "일");
                 new Thread(() -> {
@@ -151,10 +157,11 @@ public class MainController implements Initializable {
 
         matchObservableList = FXCollections.observableArrayList();
         for (PlayMatch playMatch : playMatchList) {
-            matchObservableList.add((new TableMatchData(
+            matchObservableList.add((new MatchTableData(
                     new SimpleLongProperty(playMatch.getId()),
                     new SimpleStringProperty(playMatch.getHomeTeam().getName()
                             + " vs " + playMatch.getAwayTeam().getName()),
+                    new SimpleStringProperty(playMatch.getState().getDescription()),
                     new SimpleStringProperty(String.format("%.2f",
                             playMatch.getDividendList().get(0).getDividendRate())),
                     new SimpleStringProperty(String.format("%.2f",
@@ -164,6 +171,7 @@ public class MainController implements Initializable {
         }
         matchIdColumn.setCellValueFactory(cellData -> cellData.getValue().matchIdProperty());
         matchColumn.setCellValueFactory(cellData -> cellData.getValue().matchProperty());
+        matchStateColumn.setCellValueFactory(cellData -> cellData.getValue().matchStateProperty());
         homeColumn.setCellValueFactory(cellData -> cellData.getValue().home_dividendProperty());
         drawColumn.setCellValueFactory(cellData -> cellData.getValue().draw_dividendProperty());
         awayColumn.setCellValueFactory(cellData -> cellData.getValue().away_dividendProperty());
@@ -175,29 +183,34 @@ public class MainController implements Initializable {
     public void loadingResultTable() {
         List<Betting> bettingList = getBettingList();
 
-        resultObservableList = FXCollections.observableArrayList();
+        bettingObservableList = FXCollections.observableArrayList();
         if (!bettingList.isEmpty()) {
             for (Betting betting : bettingList) {
-                resultObservableList.add((new BettingMatchData(
-                        new SimpleLongProperty(betting.getId()),
-                        new SimpleStringProperty(betting.getDividend().getPlayMatch().getHomeTeam().getName()
-                                + " vs " + betting.getDividend().getPlayMatch().getAwayTeam().getName()),
-                        new SimpleStringProperty(betting.getDividend().getPlayMatch().getState().getDescription()),
-                        new SimpleStringProperty(betting.getState().getDescription()),
-                        new SimpleLongProperty(betting.getBettingMoney()),
-                        new SimpleLongProperty((long) (betting.getBettingMoney()
-                                * betting.getDividend().getDividendRate())))));
+                if(betting.getState().equals(BettingState.YET)) {
+                    bettingObservableList.add((new BettingTableData(
+                            new SimpleLongProperty(betting.getId()),
+                            new SimpleStringProperty(betting.getDividend().getPlayMatch().getHomeTeam().getName()
+                                    + " vs " + betting.getDividend().getPlayMatch().getAwayTeam().getName()),
+                            new SimpleStringProperty(betting.getDividend().getPlayMatch().getState().getDescription()),
+                            new SimpleStringProperty(new SimpleDateFormat("YYYY-MM-dd").format(
+                                    betting.getDividend().getPlayMatch().getKickoffDate())),
+                            new SimpleStringProperty(betting.getState().getDescription()),
+                            new SimpleLongProperty(betting.getBettingMoney()),
+                            new SimpleLongProperty((long) (betting.getBettingMoney()
+                                    * betting.getDividend().getDividendRate())))));
+                }
             }
         }
         bettingIdColumn.setCellValueFactory(cellData -> cellData.getValue().bettingIdProperty());
-        resultMatchColumn.setCellValueFactory(cellData -> cellData.getValue().bettingMatchProperty());
-        matchStateColumn.setCellValueFactory(cellData -> cellData.getValue().matchStateProperty());
-        battingStateColumn.setCellValueFactory(cellData -> cellData.getValue().bettingStateProperty());
-        getMoneyColumn.setCellValueFactory(cellData -> cellData.getValue().bettingMoneyProperty());
-        resultMoneyColumn.setCellValueFactory(cellData -> cellData.getValue().bettingResultMoneyProperty());
+        bettingMatchColumn.setCellValueFactory(cellData -> cellData.getValue().bettingMatchProperty());
+        bettingMatchStateColumn.setCellValueFactory(cellData -> cellData.getValue().resultMatchStateProperty());
+        bettingMatchDateColumn.setCellValueFactory(cellData -> cellData.getValue().matchDateProperty());
+        bettingStateColumn.setCellValueFactory(cellData -> cellData.getValue().bettingStateProperty());
+        bettingMoneyColumn.setCellValueFactory(cellData -> cellData.getValue().bettingMoneyProperty());
+        expectMoneyColumn.setCellValueFactory(cellData -> cellData.getValue().bettingResultMoneyProperty());
 
-        resultTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        resultTableView.setItems(resultObservableList);
+        bettingTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        bettingTableView.setItems(bettingObservableList);
     }
 
     @FXML
@@ -207,8 +220,21 @@ public class MainController implements Initializable {
             @Override
             public void handle(MouseEvent event) {
                 if (matchTableView.getSelectionModel().getSelectedItem()
-                        .matchProperty().getValue().toString().equals(""))
+                        .matchProperty().getValue().equals("")) {
                     return;
+                }
+
+                if (DatabaseDAO.isAlreadyBet(
+                        matchTableView.getSelectionModel().getSelectedItem()
+                                .matchIdProperty().getValue())) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("오류");
+                    alert.setHeaderText(null);
+                    alert.setContentText("이미 투자한 경기입니다.");
+                    alert.show();
+                    return;
+                }
+
                 FXMLLoader fxmlLoader = new FXMLLoader();
                 fxmlLoader.setLocation(getClass().getClassLoader().
                         getResource("fxmls/DoBettingView.fxml"));
@@ -224,7 +250,7 @@ public class MainController implements Initializable {
                                 .matchIdProperty().getValue());
                 doBettingViewController.setData(
                         matchTableView.getSelectionModel().getSelectedItem()
-                                .matchProperty().getValue().toString());
+                                .matchProperty().getValue());
 
                 Parent parent = fxmlLoader.getRoot();
                 Stage stage = new Stage();
@@ -233,14 +259,11 @@ public class MainController implements Initializable {
             }
         });
 
-        resultTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if (resultTableView.getSelectionModel().getSelectedItem()
-                        .bettingMatchProperty().getValue().toString().equals(""))
+        bettingTableView.setOnMouseClicked((event) -> {
+                if (bettingTableView.getSelectionModel().getSelectedItem()
+                        .bettingMatchProperty().getValue().equals(""))
                     return;
-                // TODO : 결과 테이블 클릭했을 때
-            }
+                // 결과 테이블 클릭했을 때
         });
     }
 
@@ -261,13 +284,67 @@ public class MainController implements Initializable {
         stage.show();
     }
 
-    public void setTimes(String tm) {
-        times.setText(tm);
+    public void setTimeText(String tm) {
+        timeText.setText(tm);
     }
 
     public void nextBtnAction(ActionEvent actionEvent) {
-        setTimes(nextDate());
+        updatePlayMatchState();
+        makeRandomPlayMatchResult();
+        refreshAndUpdateUserEarnMoney(getEarnMoneyBettingList());
+        setTimeText(nextDate());
         nextSchedule();
+    }
+
+    private void refreshAndUpdateUserEarnMoney(List<Betting> earnMoneyBettingList) {
+        long earnMoney = 0L;
+        StringBuilder contentStringBuilder = new StringBuilder(" ");
+//        if(!earnMoneyBettingList.isEmpty()) {
+            for (Betting betting : earnMoneyBettingList) {
+                long resultMoney = betting.getBettingResult().getResultMoney();
+                earnMoney += resultMoney;
+                contentStringBuilder.append(betting.getDividend().getPlayMatch().getHomeTeam().getName()
+                        + " vs " + betting.getDividend().getPlayMatch().getAwayTeam().getName() + " -> "
+                        + betting.getDividend().getPlayMatch().getPlayMatchResult().toString() + " = "
+                        + resultMoney + "원\n");
+                updateBettingResultIsPaid(betting, true);
+            }
+//        }
+
+        DatabaseDAO.chargeMoney(earnMoney);
+        updateUserInfo(getUser());
+
+        if(earnMoney != 0L) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("축하합니다!");
+            alert.setHeaderText("총 " + earnMoney + "원을 획득하셨습니다!!");
+            alert.setContentText(contentStringBuilder.toString());
+            alert.show();
+        }
+    }
+
+    public static Stage resultWindow;
+
+    public void resultBtnAction(ActionEvent actionEvent) {
+        loadingResultWindow();
+    }
+
+    private void loadingResultWindow() {
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        fxmlLoader.setLocation(getClass().getClassLoader().
+                getResource("fxmls/ResultView.fxml"));
+        try {
+            fxmlLoader.load();
+        } catch (IOException e) {
+            Alert.AlertType.INFORMATION.toString();
+        }
+        Parent parent = fxmlLoader.getRoot();
+        if(resultWindow == null) {
+            resultWindow = new Stage();
+        }
+        resultWindow.setScene(new Scene(parent));
+        resultWindow.setTitle("배팅 결과");
+        resultWindow.show();
     }
 
     private String nextDate() {
@@ -281,8 +358,10 @@ public class MainController implements Initializable {
     }
 
     private void nextSchedule() {
-        DatabaseDAO.deleteBettingAndEarnUserMoney();
         loadingMatchTable();
         loadingResultTable();
+        if(resultWindow != null && resultWindow.isShowing()) {
+            loadingResultWindow();
+        }
     }
 }

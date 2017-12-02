@@ -35,7 +35,7 @@ public class DoBettingViewController implements Initializable{
     }
 
     public void BetBtnAction1(ActionEvent actionEvent) {
-        CreateCheckBettingScene(KindOfDividend.WIN);
+        CreateCheckBettingScene(KindOfDividend.HOME);
     }
 
     public void setData(String lineUp) {
@@ -47,7 +47,7 @@ public class DoBettingViewController implements Initializable{
     }
 
     public void BetBtnAction3(ActionEvent actionEvent) {
-        CreateCheckBettingScene(KindOfDividend.LOSE);
+        CreateCheckBettingScene(KindOfDividend.AWAY);
     }
 
     private void CreateCheckBettingScene(KindOfDividend kindOfDividend) {

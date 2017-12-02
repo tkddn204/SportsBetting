@@ -23,8 +23,10 @@
     <property name="hibernate.use_sql_comments">false</property>
 
     <mapping class="com.ssanggland.models.Betting" />
+    <mapping class="com.ssanggland.models.BettingResult" />
     <mapping class="com.ssanggland.models.Dividend" />
     <mapping class="com.ssanggland.models.PlayMatch" />
+    <mapping class="com.ssanggland.models.PlayMatchResult" />
     <mapping class="com.ssanggland.models.League" />
     <mapping class="com.ssanggland.models.Team" />
     <mapping class="com.ssanggland.models.User" />

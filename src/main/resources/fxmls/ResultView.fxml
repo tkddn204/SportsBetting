@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.AnchorPane?>
+
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+
+<AnchorPane prefHeight="320.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/8.0.121"
+            fx:id="resultBettingPane" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ssanggland.controllers.ResultViewController">
+    <children>
+        <TableView fx:id="resultTableView" layoutX="20.0" layoutY="20.0" prefHeight="280.0" prefWidth="810.0">
+            <columns>
+                <TableColumn fx:id="resultIdColumn" prefWidth="40.0" text="ID" />
+                <TableColumn fx:id="resultMatchColumn" prefWidth="370.0" text="경기정보" />
+                <TableColumn fx:id="resultMatchDateColumn" prefWidth="120.0" text="경기날짜"/>
+                <TableColumn fx:id="resultMatchVerseColumn" prefWidth="90.0" text="경기결과"/>
+                <TableColumn fx:id="resultBettingStateColumn" prefWidth="90.0" text="배팅결과"/>
+                <TableColumn fx:id="resultMoneyColumn" prefWidth="90.0" text="결과금" />
+            </columns>
+        </TableView>
+    </children>
+
+</AnchorPane>

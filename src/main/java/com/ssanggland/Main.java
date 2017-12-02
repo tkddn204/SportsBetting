@@ -184,9 +184,9 @@ public class Main extends Application {
         if (getLeagueCount() < 1L) {
             loadLeagueTeamSQL(getClass().getClassLoader().
                     getResource("leagueTeamList.sql").getPath());
-            if (getPlayMatchList(cal).isEmpty()) {
-                getRandomPlayMatchList(cal);
-                cal = Calendar.getInstance();
+            Calendar calendar = Calendar.getInstance();
+            if (getPlayMatchList(calendar).isEmpty()) {
+                getRandomPlayMatchList(calendar);
             }
         }
 
@@ -205,6 +205,7 @@ public class Main extends Application {
             MainController mainController = loader.getController();
             mainController.updateUserInfo(user);
             LoginSession.getInstance().setSessionUserId(user.getId());
+            cal = Calendar.getInstance();
 
             Scene main_scene = new Scene(parent);
             window.setScene(main_scene);

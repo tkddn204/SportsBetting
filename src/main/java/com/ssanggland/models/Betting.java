@@ -31,6 +31,11 @@ public class Betting implements Serializable {
     @Enumerated(EnumType.STRING)
     private BettingState state = BettingState.YET;
 
+    @OneToOne(mappedBy = "betting", cascade = CascadeType.ALL)
+    @MapsId
+    @JoinColumn(name="betting_id")
+    private BettingResult bettingResult;
+
     public Betting() {}
 
     public Betting(User user, Dividend dividend, long bettingMoney) {
@@ -92,5 +97,13 @@ public class Betting implements Serializable {
 
     public void setState(BettingState state) {
         this.state = state;
+    }
+
+    public BettingResult getBettingResult() {
+        return bettingResult;
+    }
+
+    public void setBettingResult(BettingResult bettingResult) {
+        this.bettingResult = bettingResult;
     }
 }
