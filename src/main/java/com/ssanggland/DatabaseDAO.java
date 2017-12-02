@@ -278,7 +278,7 @@ public class DatabaseDAO {
         query.setParameter(1, PlayMatchState.ENDGAME);
         List<PlayMatch> playMatchList = query.list();
         for (PlayMatch playMatch : playMatchList) {
-            if (new Random().nextInt(10) > 0) {
+            if (new Random().nextInt(20) > 0) {
                 playMatch.setState(PlayMatchState.ENDGAME);
             } else {
                 playMatch.setState(PlayMatchState.EXTEND);
@@ -371,11 +371,12 @@ public class DatabaseDAO {
         User user = getUser();
         Transaction transaction = session.beginTransaction();
         Query query = session.createQuery("from Betting betting" +
-                " where betting.user.id = ? and" +
-                " betting.bettingResult.isPaid = ?");
+                " where betting.user.id = ? and betting.bettingResult.isPaid = ?" +
+                " and betting.dividend.playMatch.state = ?");
 
         query.setParameter(0, user.getId());
         query.setParameter(1, false);
+        query.setParameter(2, PlayMatchState.ENDGAME);
 
         List<Betting> bettingList = query.list();
         transaction.commit();
